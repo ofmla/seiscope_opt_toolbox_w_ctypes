@@ -1,0 +1,7 @@
+# Ignore objects, module interfaces and output files
+*.o
+*.mod
+*.dat
+
+# Ignore pdf files
+*.pdf
