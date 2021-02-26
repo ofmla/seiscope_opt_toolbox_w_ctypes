@@ -14,7 +14,7 @@ The SEISCOPE toolbox uses a derived data type (`optim`); functionality that is n
 The repo contains a single `src` directory with two subdirectories `fortran` and `python`. The modified source files along the `Makefile` are in the `fortran ` folder, while `python` contains two python scripts with examples where the toolbox is used: The *Rosenbrock function* and *Least Square Reverse Time Migration (LSQRTM)* optimization problems. To build the dynamic library from the source files, execute the `Makefile` in the `fortran` directory. The examples can be run after the shared
 object has been built to test that it works as it should. Note that you must have [Devito](https://www.devitoproject.org/) installed to run the *LSQRTM* example.
 
-A python script `plot_curves.py` is also provide in the `python` directory. The following figures were obtained after the LSQRTM run with the `plot_curves.py` script.
+A python script `plot_curves.py` is also provide in the `python` directory. Please note that it may not be the best implementation and is intended for illustrative purposes only. The following figures were obtained after the LSQRTM run with the `plot_curves.py` script.
 
 <img src="https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes/blob/main/src/python/computationalcost_curves.svg" width="425"/> <img src="https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes/blob/main/src/python/convergence_curves.svg" width="425"/> 
 
