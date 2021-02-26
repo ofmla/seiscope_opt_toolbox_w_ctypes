@@ -9,3 +9,8 @@ object has been built to test that it works as it should. Note that you must hav
 A python script `plot_curves.py` is also provide in the `python` directory. The following figures were obtained after the LSQRTM run with the `plot_curves.py` script.
 
 <img src="https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes/blob/main/src/python/computationalcost_curves.svg" width="425"/> <img src="https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes/blob/main/src/python/convergence_curves.svg" width="425"/> 
+
+See also
+------
+ * SEISCOPE optimization toolbox paper: https://library.seg.org/doi/10.1190/geo2015-0031.1
+ * Original source code: http://seiscope2.osug.fr/IMG/tgz/TOOLBOX_22_09_2014_OPTIMIZATION.tgz
