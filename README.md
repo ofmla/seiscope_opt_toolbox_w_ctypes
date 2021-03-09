@@ -8,6 +8,7 @@ and Romain Brossier. Minor changes to the original code have been made to allow 
  *  New Makefile for building a dynamic version of the library with a debug option.
  *  Removing Trivial Code Duplication: same procedures in Steepest Descent and Preconditioned Nonlinear Conjugate Gradient subdirectories.
  *  Removing unused variable declarations.
+ *  Vectors of lower and upper bounds (box constrainst) are now optional arguments in the optimization subroutines instead of array components of a derived data type
 
 The SEISCOPE toolbox uses a derived data type (`optim`); functionality that is not yet supported at this time by f2py - and for this reason it is used [ctypes](https://docs.python.org/3/library/ctypes.html).
 
