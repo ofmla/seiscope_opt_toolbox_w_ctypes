@@ -5,3 +5,7 @@
 
 # Ignore pdf files
 *.pdf
+
+# Ignore directories created
+src/python/__pycache__
+src/python/dask-worker-space
