@@ -1,95 +1,28 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import ctypes as ct
-import os
 import numpy as np
-import subprocess
 
 from devito import configuration
 from examples.seismic import demo_model, AcquisitionGeometry, Receiver
 from examples.seismic.tti import AnisotropicWaveSolver
 from devito import Function, TimeFunction, gaussian_smooth
 
-from ctypes import POINTER, c_int, c_float, c_bool
+from ctypes import c_int, c_float, c_bool
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
 
+from interface import sotb_wrapper
+
 configuration['log-level'] = 'WARNING'
-# Get the location of the shared library file.
-here = os.path.dirname(os.path.abspath(__file__))
-lib_file = os.path.join(here, '..','fortran','lib', 'libOPTIM.so')
-
-
-class UserDefined(ct.Structure):
-    """Demonstrate how to wrap a Fortran derived type in Python using ctypes.
-
-    Fields of the derived type are stored in the _fields_ attribute, which is
-    a dict.
-    """
-    _fields_ = [
-        ('debug', c_bool),
-        ('threshold', c_float),
-        ('print_flag', c_int),
-        ('first_ls', c_bool),
-        ('task', c_int),
-        ('nls_max', c_int),
-        ('cpt_ls', c_int),
-        ('nfwd_pb', c_int),
-        ('cpt_iter', c_int),
-        ('niter_max', c_int),
-        ('f0', c_float),
-        ('fk', c_float),
-        ('conv', c_float),
-        ('m1', c_float),
-        ('m2', c_float),
-        ('mult_factor', c_float),
-        ('alpha_L', c_float),
-        ('alpha_R', c_float),
-        ('alpha', c_float),
-        ('q0', c_float),
-        ('q', c_float),
-        ('cpt_lbfgs', c_int),
-        ('l', c_int)
-    ]
-
-    def __repr__(self):
-        """Print a representation of the derived type."""
-        template = (
-            'UserDefined(debug={self.debug}, '
-            'threshold={self.threshold}, '
-            'print_flag={self.print_flag}, '
-            'first_ls={self.first_ls}, '
-            'task={self.task}, '
-            'nls_max={self.nls_max}, '
-            'cpt_ls={self.cpt_ls}, '
-            'nfwd_pb={self.nfwd_pb}, '
-            'cpt_iter={self.cpt_iter}, '
-            'niter_max={self.niter_max}, '
-            'f0={self.f0}, '
-            'fk={self.fk}, '
-            'conv={self.conv}, '
-            'm1={self.m1}, '
-            'm2={self.m2}, '
-            'mult_factor={self.mult_factor}, '
-            'alpha_L={self.alpha_L}, '
-            'alpha_R={self.alpha_R}, '
-            'alpha={self.alpha}, '
-            'q0={self.q0}, '
-            'conv={self.q}, '
-            'cpt_lbfgs={self.cpt_lbfgs}, '
-            'l={self.l})'
-        )
-        return template.format(self=self)
-
 
 # Define true and initial model
-shape = (101, 101)  # Number of grid point (nx, nz)
+shape = (101, 101)    # Number of grid point (nx, nz)
 spacing = (10., 10.)  # Grid spacing in m. The domain size is now 1km by 1km
-origin = (0., 0.)  # What is the location of the top left corner.
+origin = (0., 0.)     # What is the location of the top left corner.
 nbl = 50
 space_order = 4
 dtype = np.float32
@@ -191,35 +124,30 @@ def lsm_gradient(x):
         objective += .5*np.linalg.norm(residual.data.flatten())**2
         solver.jacobian_adjoint(rec=residual, u0=u, v0=v, vp=model0.vp, dm=grad)
 
-    return objective, grad.data.flatten().astype(c_float)
-
-
-# This is how a dll/so library is loaded
-lib_example = ct.cdll.LoadLibrary(lib_file)
+    return c_float(objective), grad.data.flatten().astype(c_float)
 
 words = ['PSTD', 'PNLCG', 'LBFGS']
 a_3d_array = np.zeros((model.grid.shape[0], model.grid.shape[1], 3))
 
+# Create an instance of the SEISCOPE optimization toolbox (sotb) Class.
+sotb = sotb_wrapper()
+
 for i, word in enumerate(words):
-    # Create a UserDefined derived type in Fortran.
-    udf = UserDefined()
 
     # parameter initialization
-    floatptr = POINTER(c_float)
     n = c_int(model.grid.shape[0]*model.grid.shape[1])  # dimension
     flag = c_int(0)                                     # first flag
-    udf.conv = c_float(1e-8)
-    udf.print_flag = c_int(1)
-    udf.debug = c_bool(False)
-    udf.niter_max = c_int(25)
-    udf.nls_max = c_int(30)
-    udf.l = c_int(5)
+    sotb.udf.conv = c_float(1e-8)  # tolerance for the stopping criterion
+    sotb.udf.print_flag = c_int(1) # print info in output files
+    sotb.udf.debug = c_bool(False) # level of details for output files
+    sotb.udf.niter_max = c_int(25) # maximum iteration number
+    sotb.udf.nls_max = c_int(30)   # max number of linesearch iteration
+    sotb.udf.l = c_int(5)
 
     # Print the derived type.
     print('Hello from Python!')
-    print(udf.__repr__())
+    print(sotb.udf)
 
-    f = getattr(lib_example, word)
     # intial guess
     X = np.zeros(model.grid.shape, dtype=c_float).reshape(-1)
 
@@ -235,13 +163,12 @@ for i, word in enumerate(words):
     # linesearch not failed, iterate
 
     while (flag.value != 2 and flag.value != 4):
-        if word != 'LBFGS':
-            f(ct.byref(n), X.ctypes.data_as(floatptr), ct.byref(c_float(fcost)),
-              grad.ctypes.data_as(floatptr), grad_preco.ctypes.data_as(floatptr),
-              ct.byref(udf), ct.byref(flag), None, None)
+        if word == 'PSTD':
+            sotb.PSTD(n, X, fcost, grad, grad_preco, flag)
+        elif word == 'PNLCG':
+            sotb.PNLCG(n, X, fcost, grad, grad_preco, flag)
         else:
-            f(ct.byref(n), X.ctypes.data_as(floatptr), ct.byref(c_float(fcost)),
-              grad.ctypes.data_as(floatptr), ct.byref(udf), ct.byref(flag), None, None)
+            sotb.LBFGS(n, X, fcost, grad, flag)
         if (flag.value == 1):
             # compute cost and gradient at point x
             fcost, grad = lsm_gradient(X)
@@ -268,8 +195,8 @@ vmin = np.amin(dm[nbl:shape[0]+nbl, nbl:shape[1]+nbl])
 
 mpl.rcParams['font.size'] = 8.5
 fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
-#fig.subplots_adjust(wspace=0.5)
-#fig.subplots_adjust(hspace=0.25)
+fig.subplots_adjust(wspace=0.2)
+fig.subplots_adjust(hspace=0.2)
 #
 im1 = ax1.imshow(dm[nbl:shape[0]+nbl, nbl:shape[1]+nbl].T, cmap=plt.cm.seismic,
                  vmin=vmin, vmax=vmax)

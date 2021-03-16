@@ -1,76 +1,6 @@
-import ctypes
-import os
-import time
-
 import numpy as np
-
-from ctypes import POINTER, c_int, c_float, c_char_p, c_bool
-
-# Get the location of the shared library file.
-here = os.path.dirname(os.path.abspath(__file__))
-lib_file = os.path.join(here, '..','fortran','lib', 'libOPTIM.so')
-
-
-class UserDefined(ctypes.Structure):
-    """Demonstrate how to wrap a Fortran derived type in Python using ctypes.
-
-    Fields of the derived type are stored in the _fields_ attribute, which is a dict.
-    """
-    _fields_ = [
-        ('debug', c_bool),
-        ('threshold', c_float),
-        ('print_flag', c_int),
-        ('first_ls', c_bool),
-        ('task', c_int),
-        ('nls_max', c_int),
-        ('cpt_ls', c_int),
-        ('nfwd_pb', c_int),
-        ('cpt_iter', c_int),
-        ('niter_max', c_int),
-        ('f0', c_float),
-        ('fk', c_float),
-        ('conv', c_float),
-        ('m1', c_float),
-        ('m2', c_float),
-        ('mult_factor', c_float),
-        ('alpha_L', c_float),
-        ('alpha_R', c_float),
-        ('alpha', c_float),
-        ('q0', c_float),
-        ('q', c_float),
-        ('cpt_lbfgs',c_int),
-        ('l',c_int)
-    ]
-
-    def __repr__(self):
-        """Print a representation of the derived type."""
-        template = (
-            'UserDefined(debug={self.debug}, '
-            'threshold={self.threshold}, '
-            'print_flag={self.print_flag}, '
-            'first_ls={self.first_ls}, '
-            'task={self.task}, '
-            'nls_max={self.nls_max}, '
-            'cpt_ls={self.cpt_ls}, '
-            'nfwd_pb={self.nfwd_pb}, '
-            'cpt_iter={self.cpt_iter}, '
-            'niter_max={self.niter_max}, '
-            'f0={self.f0}, '
-            'fk={self.fk}, '
-            'conv={self.conv}, '
-            'm1={self.m1}, '
-            'm2={self.m2}, '
-            'mult_factor={self.mult_factor}, '
-            'alpha_L={self.alpha_L}, '
-            'alpha_R={self.alpha_R}, '
-            'alpha={self.alpha}, '
-            'q0={self.q0}, '
-            'conv={self.q},'
-            'cpt_lbfgs={self.cpt_lbfgs}, '
-            'l={self.l})'
-        )
-        return template.format(self=self)
-
+from interface import sotb_wrapper
+from ctypes import c_int, c_float, c_bool
 
 def rosenbrock(X):
     """
@@ -83,58 +13,51 @@ def rosenbrock(X):
     c = X[0] - 1.
     return c_float(a*a + b*b*100.), np.array([2.*c - 400.*X[0]*b, 200.*b], dtype=c_float)
 
-
-# This is how a dll/so library is loaded
-lib_example = ctypes.cdll.LoadLibrary(lib_file)
-
-
 def main():
-    """Demonstrate how to use ctypes to use Fortran libraries."""
-    # Create a UserDefined derived type in Fortran.
+    """
+    Demonstrate how to use the SEISCOPE optimization toolbox (sotb) wrapper to
+    find the minimum of Rosenbrock's banana function (a famous test case for
+    optimization software)
+    """
+    # Create ctype variables to build the UserDefined derived type in Fortran.
     conv = c_float(1e-8)
     print_flag = c_int(1)
     debug = c_bool(False)
     niter_max = c_int(10000)
-    udf = UserDefined()
-
+    
+    # Create an instance of the SEISCOPE optimization toolbox (sotb) Class.
+    sotb = sotb_wrapper()
+    
+	# Set some fields of the UserDefined derived type in Fortran (ctype structure).
     # parameter initialization
-    floatptr = POINTER(c_float)
-    n = c_int(2)                # dimension
-    flag = c_int(0)             # first flag
-    udf.conv = conv             # tolerance for the stopping criterion
-    udf.print_flag = print_flag # print info in output files
-    udf.debug = debug           # level of details for output files
-    udf.niter_max = niter_max   # maximum iteration number
-    udf.nls_max = c_int(30)     # max number of linesearch iteration
+    n = c_int(2)                     # dimension
+    flag = c_int(0)                  # first flag
+    sotb.udf.conv = conv             # tolerance for the stopping criterion
+    sotb.udf.print_flag = print_flag # print info in output files
+    sotb.udf.debug = debug           # level of details for output files
+    sotb.udf.niter_max = niter_max   # maximum iteration number
+    sotb.udf.nls_max = c_int(30)     # max number of linesearch iteration
 
     # Print the derived type.
     print('Hello from Python!')
-    print(udf.__repr__())
+    print(sotb.udf)
 
     # intial guess
     X = np.ones(n.value, dtype=c_float)*1.50
-    #grad = np.zeros(n.value, dtype=c_float)
 
     # computation of the cost and gradient associated
     # with the initial guess
     fcost, grad = rosenbrock(X)
-    #fcost = c_float(0.)
-    #lib_example.rosenbrock(X.ctypes.data_as(floatptr), ctypes.byref(fcost), grad.ctypes.data_as(floatptr))
-    #print(fcost, grad)
 
     # copy of grad in grad_preco: no preconditioning in
     # this test
     grad_preco = np.copy(grad)
 
     while (flag.value != 2 and flag.value != 4):
-        lib_example.PNLCG(ctypes.byref(n), X.ctypes.data_as(floatptr), ctypes.byref(fcost), grad.ctypes.data_as(floatptr),
-                          grad_preco.ctypes.data_as(floatptr), ctypes.byref(udf), ctypes.byref(flag), None, None)
-        #lib_example.LBFGS(ctypes.byref(n), X.ctypes.data_as(floatptr), ctypes.byref(c_float(fcost)), grad.ctypes.data_as(floatptr),
-        #                  ctypes.byref(udf), ctypes.byref(flag))
+        sotb.PNLCG(n, X, fcost, grad, grad_preco, flag)
         if (flag.value == 1):
             # compute cost and gradient at point x
             fcost, grad = rosenbrock(X)
-            #lib_example.rosenbrock(X.ctypes.data_as(floatptr), ctypes.byref(fcost), grad.ctypes.data_as(floatptr))
             # no preconditioning in this test: simply copy grad in
             # grad_preco
             grad_preco = np.copy(grad)
