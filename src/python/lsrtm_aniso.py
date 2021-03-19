@@ -17,6 +17,12 @@ from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
 
 from interface import sotb_wrapper
 
+'''
+In this script we show a simple numerical examples for LSRTM
+implemented using Devito software and the SEISCOPE optimization
+toolbox (sotb) wrapper.
+'''
+
 configuration['log-level'] = 'WARNING'
 
 # Define true and initial model

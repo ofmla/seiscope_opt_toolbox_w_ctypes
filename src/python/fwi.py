@@ -20,12 +20,6 @@ from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
 
 from interface import sotb_wrapper
 
-'''
-In this script we show a simple numerical examples for LSRTM
-implemented using Devito software and the SEISCOPE optimization
-toolbox (sotb) wrapper.
-'''
-
 
 # Serial modeling function
 def forward_modeling_single_shot(model, geometry, save=False, dt=4.0):
