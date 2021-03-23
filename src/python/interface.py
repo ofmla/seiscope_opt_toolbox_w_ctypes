@@ -5,9 +5,9 @@ from ctypes import POINTER, c_int, c_float, c_char_p, c_bool
 
 
 class UserDefined(ctypes.Structure):
-    """Demonstrate how to wrap a Fortran derived type in Python using ctypes.
-
-    Fields of the derived type are stored in the _fields_ attribute, which is a dict.
+    """Creates a struct to match the optim Fortran derived type in 
+    SEISCOPE optimization toolbox. Fields of the derived type are
+    stored in the _fields_ attribute, which is a dict.
     """
     _fields_ = [
         ('debug', c_bool),
@@ -68,7 +68,6 @@ class UserDefined(ctypes.Structure):
 here = os.path.dirname(os.path.abspath(__file__))
 lib_file = os.path.join(here, '..', 'fortran', 'lib', 'libOPTIM.so')
 
-_path = os.path.dirname('__file__')
 # This is how a dll/so library is loaded
 lib_sotb = ctypes.cdll.LoadLibrary(lib_file)
 

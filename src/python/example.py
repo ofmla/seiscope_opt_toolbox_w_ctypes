@@ -21,9 +21,9 @@ def main():
     """
     # Create ctype variables to build the UserDefined derived type in Fortran.
     conv = c_float(1e-8)
-    print_flag = c_int(1)
+    print_flag = 1
     debug = c_bool(False)
-    niter_max = c_int(10000)
+    niter_max = 10000
     
     # Create an instance of the SEISCOPE optimization toolbox (sotb) Class.
     sotb = sotb_wrapper()
