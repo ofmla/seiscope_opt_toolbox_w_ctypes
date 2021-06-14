@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  Build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        gcc_v: [9] # Version of GFortran we want to use.
+        python-version: [3.8]
+    env:
+      FC: gfortran-${{ matrix.gcc_v }}
+      GCC_V: ${{ matrix.gcc_v }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install Python
+      uses: actions/setup-python@v1 # Use pip to install latest CMake, & FORD/Jin2For, etc.
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Python dependencies
+      if: contains( matrix.os, 'ubuntu')
+      run: |
+        python -m pip install --upgrade pip
+        pip install FoBiS.py numpy matplotlib
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Install GFortran Linux
+      if: contains( matrix.os, 'ubuntu')
+      run: |
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+        sudo apt-get update
+        sudo apt-get install -y gcc-${GCC_V} gfortran-${GCC_V}
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_V} 100 \
+        --slave /usr/bin/gfortran gfortran /usr/bin/gfortran-${GCC_V} \
+        --slave /usr/bingcov gcov /usr/bin/gcov-${GCC_V}
+
+    - name: Compile
+      run: |
+        FoBiS.py build -f seiscope_opt_toolbox_w_ctypes.fobis -mode shared-gnu
+        FoBis.py build -f seiscope_opt_toolbox_w_ctypes.fobis -mode tests-gnu
+
+    - name: Test with pytest
+      run: py.test -vs tests
