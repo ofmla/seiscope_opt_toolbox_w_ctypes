@@ -98,7 +98,7 @@ class UserDefined(ctypes.Structure):
 
 # Get the location of the shared library file.
 here = os.path.dirname(os.path.abspath(__file__))
-lib_file = os.path.join(here, '..', 'fortran', 'lib', 'libOPTIM.so')
+lib_file = os.path.join(here, '..', 'lib', 'libOPTIM.so')
 
 # This is how a dll/so library is loaded
 lib_sotb = ctypes.cdll.LoadLibrary(lib_file)

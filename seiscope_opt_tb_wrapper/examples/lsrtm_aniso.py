@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import pathmagic  # noqa
 import numpy as np
 
 from devito import configuration
@@ -143,11 +144,11 @@ for i, word in enumerate(words):
     # parameter initialization
     n = c_int(model.grid.shape[0]*model.grid.shape[1])  # dimension
     flag = c_int(0)                                     # first flag
-    sotb.udf.conv = c_float(1e-8)  # tolerance for the stopping criterion
-    sotb.udf.print_flag = c_int(1) # print info in output files
-    sotb.udf.debug = c_bool(False) # level of details for output files
-    sotb.udf.niter_max = c_int(25) # maximum iteration number
-    sotb.udf.nls_max = c_int(30)   # max number of linesearch iteration
+    sotb.udf.conv = c_float(1e-8)   # tolerance for the stopping criterion
+    sotb.udf.print_flag = c_int(1)  # print info in output files
+    sotb.udf.debug = c_bool(False)  # level of details for output files
+    sotb.udf.niter_max = c_int(25)  # maximum iteration number
+    sotb.udf.nls_max = c_int(30)    # max number of linesearch iteration
     sotb.udf.l = c_int(5)
 
     # Print the derived type.

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import pathmagic  # noqa
 import os
 import numpy as np
 
@@ -27,6 +28,7 @@ def forward_modeling_single_shot(model, geometry, save=False, dt=4.0):
     d_obs, u0 = solver.forward(vp=model.vp, save=save)[0:2]
     return d_obs.resample(dt), u0
 
+
 # Parallel modeling function
 def forward_modeling_multi_shots(client, model, geometry, save=False, dt=4.0):
 
@@ -51,6 +53,7 @@ def forward_modeling_multi_shots(client, model, geometry, save=False, dt=4.0):
 
     return shots
 
+
 # Serial FWI objective function
 def fwi_objective_single_shot(model, geometry, d_obs):
 
@@ -63,7 +66,8 @@ def fwi_objective_single_shot(model, geometry, d_obs):
 
     # Predicted data and residual
     d_pred, u0 = solver.forward(vp=model.vp, save=True)[0:2]
-    residual.data[:] = d_pred.data[:] - d_obs.resample(geometry.dt).data[:][0:d_pred.data.shape[0], :]
+    dobs_resampled = d_obs.resample(geometry.dt).data[:][0:d_pred.data.shape[0], :]
+    residual.data[:] = d_pred.data[:] - dobs_resampled
 
     # Function value and gradient
     fval = .5*np.linalg.norm(residual.data.flatten())**2
@@ -73,6 +77,7 @@ def fwi_objective_single_shot(model, geometry, d_obs):
     grad_crop = np.array(grad.data[:])[model.nbl:-model.nbl, model.nbl:-model.nbl]
 
     return fval, grad_crop
+
 
 # Parallel FWI objective function
 def fwi_objective_multi_shots(client, model, geometry, d_obs):
@@ -100,6 +105,7 @@ def fwi_objective_multi_shots(client, model, geometry, d_obs):
 
     return fval, grad
 
+
 # Wrapper for scipy optimizer: x is current model in squared slowness [s^2/km^2]
 def loss(c, x, model, geometry, d_obs):
 
@@ -111,14 +117,14 @@ def loss(c, x, model, geometry, d_obs):
 
     # Evaluate objective function
     fval, grad = fwi_objective_multi_shots(c, model, geometry, d_obs)
-    return c_float(fval), grad.flatten().astype(np.float32)    # scipy expects double precision vector
+    return c_float(fval), grad.flatten().astype(np.float32)
 
 
 def main(c):
     # Set up velocity model
-    shape = (101, 101)      # Number of grid points (nx, nz).
-    spacing = (10., 10.)    # Grid spacing in m. The domain size is now 1km by 1km.
-    origin = (0, 0)         # Need origin to define relative source and receiver locations.
+    shape = (101, 101)    # Number of grid points (nx, nz).
+    spacing = (10., 10.)  # Grid spacing in m. The domain size is now 1km by 1km.
+    origin = (0, 0)  # Need origin to define relative source and receiver locations.
     nbl = 40
 
     # True model
@@ -127,7 +133,8 @@ def main(c):
 
     # Initial model
     model0 = demo_model('circle-isotropic', vp_circle=2.5, vp_background=2.5,
-                        origin=origin, shape=shape, spacing=spacing, nbl=nbl, grid=model1.grid)
+                        origin=origin, shape=shape, spacing=spacing, nbl=nbl,
+                        grid=model1.grid)
 
     # Set up acquisiton geometry
     t0 = 0.
@@ -143,35 +150,39 @@ def main(c):
     # Initialize receivers for synthetic and imaging data
     nreceivers = 101
     rec_coordinates = np.empty((nreceivers, 2))
-    rec_coordinates[:, 1] = np.linspace(spacing[0], model1.domain_size[0] - spacing[0], num=nreceivers)
+    rec_coordinates[:, 1] = np.linspace(spacing[0], model1.domain_size[0] -
+                                        spacing[0], num=nreceivers)
     rec_coordinates[:, 0] = 980.    # Receiver depth
     # Set up geometry objects for observed and predicted data
     geometry1 = AcquisitionGeometry(model1, rec_coordinates, src_coordinates, t0,
-    								tn, f0=f0, src_type='Ricker')
+                                    tn, f0=f0, src_type='Ricker')
     geometry0 = AcquisitionGeometry(model0, rec_coordinates, src_coordinates, t0,
-    								tn, f0=f0, src_type='Ricker')
+                                    tn, f0=f0, src_type='Ricker')
 
-    # Compute observed data in parallel (inverse crime). In real life we would read the SEG-Y data here.
+    # Compute observed data in parallel (inverse crime). In real life we would
+    # read the SEG-Y data here.
     d_obs = forward_modeling_multi_shots(c, model1, geometry1, save=False)
 
     # Box contraints
     vmin = 1.4    # do not allow velocities slower than water
     vmax = 4.0
-    lb = np.array([1.0/vmax**2 for _ in range(np.prod(model0.shape))]).astype(np.float32)    # in [s^2/km^2]
-    ub = np.array([1.0/vmin**2 for _ in range(np.prod(model0.shape))]).astype(np.float32)    # in [s^2/km^2]
+    lb = [1.0/vmax**2 for _ in range(np.prod(model0.shape))]  # in [s^2/km^2]
+    ub = [1.0/vmin**2 for _ in range(np.prod(model0.shape))]  # in [s^2/km^2]
+    lb = np.array(lb).astype(np.float32)
+    ub = np.array(ub).astype(np.float32)
 
     # Create an instance of the SEISCOPE optimization toolbox (sotb) Class.
     sotb = sotb_wrapper()
 
-	# Set some fields of the UserDefined derived type in Fortran (ctype structure).
+    # Set some fields of the UserDefined derived type in Fortran (ctype structure).
     # parameter initialization
-    n = c_int(shape[0]*shape[1])   # dimension
-    flag = c_int(0)				   # first flag
-    sotb.udf.conv = c_float(1e-8)  # tolerance for the stopping criterion
-    sotb.udf.print_flag = c_int(1) # print info in output files
-    sotb.udf.debug = c_bool(False) # level of details for output files
-    sotb.udf.niter_max = c_int(5)  # maximum iteration number
-    sotb.udf.nls_max = c_int(30)   # max number of linesearch iteration
+    n = c_int(shape[0]*shape[1])    # dimension
+    flag = c_int(0)				    # first flag
+    sotb.udf.conv = c_float(1e-8)   # tolerance for the stopping criterion
+    sotb.udf.print_flag = c_int(1)  # print info in output files
+    sotb.udf.debug = c_bool(False)  # level of details for output files
+    sotb.udf.niter_max = c_int(5)   # maximum iteration number
+    sotb.udf.nls_max = c_int(30)    # max number of linesearch iteration
     sotb.udf.l = c_int(5)
 
     # Print the derived type.
@@ -245,15 +256,15 @@ def main(c):
     plt.savefig('circle_isotropic_inversion.pdf')
 
 if __name__ == "__main__":
-	r'''
-	This script demonstrates how we can set up a basic FWI framework 
-	with gradient-based optimization algorithms from the SEISCOPE 
-	optimization toolbox (sotb) wrapper. The script is basically a copy 
-	of the devito FWI tutorial (https://github.com/devitocodes/devito/
-	blob/master/examples/seismic/tutorials/04_dask.ipynb) with the addition
-	of the sotb wrapper. It uses a simple toy example for validation of the 
-	code.
-	'''
+    r'''
+    This script demonstrates how we can set up a basic FWI framework
+    with gradient-based optimization algorithms from the SEISCOPE
+    optimization toolbox (sotb) wrapper. The script is basically a copy
+    of the devito FWI tutorial (https://github.com/devitocodes/devito/
+    blob/master/examples/seismic/tutorials/04_dask.ipynb) with the addition
+    of the sotb wrapper. It uses a simple toy example for validation of the
+    code.
+    '''
     print('start')
     # Start Dask cluster
     cluster = LocalCluster(n_workers=5, death_timeout=600, asynchronous=False)

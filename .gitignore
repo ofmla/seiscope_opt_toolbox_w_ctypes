@@ -7,5 +7,9 @@
 *.pdf
 
 # Ignore directories created
-src/python/__pycache__
-src/python/dask-worker-space
+bin/
+lib/
+tests/__pycache__
+seiscope_opt_tb_wrapper/__pycache__
+seiscope_opt_tb_wrapper/examples/__pycache__
+seiscope_opt_tb_wrapper/examples/dask-worker-space

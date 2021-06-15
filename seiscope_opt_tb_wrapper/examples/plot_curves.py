@@ -32,7 +32,7 @@ plt.grid(linestyle=':', linewidth=0.5)
 plt.legend(loc='upper right', frameon=True, prop={'size': 10})
 plt.savefig('convergence_curves.svg')
 #
-nwDict={}
+nwDict = {}
 str = "head -n -3  | awk 'NR >= 10 {print $(NF)}'"
 for i in words:
     word = 'iterate_' + i + '.dat'
