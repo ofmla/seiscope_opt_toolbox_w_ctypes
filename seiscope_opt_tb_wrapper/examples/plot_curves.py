@@ -20,11 +20,11 @@ for i in words:
 
 plt.figure()
 plt.plot(myDict['ST'], fillstyle='none', linestyle='-', marker='x',
-         color='k',  markersize=5, linewidth=1, label='Steepest descent')
+         color='k', markersize=5, linewidth=1, label='Steepest descent')
 plt.plot(myDict['CG'], fillstyle='none', linestyle='-', marker='^',
-         color='k',  markersize=5, linewidth=1, label='Nonlinear conjugate gradient')
+         color='k', markersize=5, linewidth=1, label='Nonlinear conjugate gradient')
 plt.plot(myDict['LB'], fillstyle='none', linestyle='-', marker='s',
-         color='k',  markersize=5, linewidth=1, label='l-BFGS')
+         color='k', markersize=5, linewidth=1, label='l-BFGS')
 plt.xlabel('Iterations')
 plt.ylabel('Relative objective function (log scale)')
 plt.yscale('log')
@@ -48,15 +48,14 @@ for i in words:
 
 plt.figure()
 plt.plot(nwDict['ST'], myDict['ST'], fillstyle='none', linestyle='-', marker='x',
-         color='k',  markersize=5, linewidth=1, label='Steepest descent')
+         color='k', markersize=5, linewidth=1, label='Steepest descent')
 plt.plot(nwDict['CG'], myDict['CG'], fillstyle='none', linestyle='-', marker='^',
-         color='k',  markersize=5, linewidth=1, label='Nonlinear conjugate gradient')
+         color='k', markersize=5, linewidth=1, label='Nonlinear conjugate gradient')
 plt.plot(nwDict['LB'], myDict['LB'], fillstyle='none', linestyle='-', marker='s',
-         color='k',  markersize=5, linewidth=1, label='l-BFGS')
+         color='k', markersize=5, linewidth=1, label='l-BFGS')
 plt.xlabel('Computed gradients')
 plt.ylabel('Relative objective function (log scale)')
 plt.yscale('log')
 plt.grid(linestyle=':', linewidth=0.5)
 plt.legend(loc='upper right', frameon=True, prop={'size': 10})
 plt.savefig('computationalcost_curves.svg')
-

@@ -1,7 +1,6 @@
-import numpy as np
 import os
 import ctypes
-from ctypes import POINTER, c_int, c_float, c_char_p, c_bool
+from ctypes import POINTER, c_int, c_float, c_bool
 
 
 class UserDefined(ctypes.Structure):
@@ -96,6 +95,7 @@ class UserDefined(ctypes.Structure):
         )
         return template.format(self=self)
 
+
 # Get the location of the shared library file.
 here = os.path.dirname(os.path.abspath(__file__))
 lib_file = os.path.join(here, '..', 'lib', 'libOPTIM.so')
@@ -185,21 +185,20 @@ class sotb_wrapper(object):
         lb_pass = lb.ctypes.data_as(POINTER(c_float)) if lb is not None else lb
         ub_pass = ub.ctypes.data_as(POINTER(c_float)) if ub is not None else ub
         self._ctypes_trn(ctypes.byref(n), x.ctypes.data_as(POINTER(c_float)),
-                           ctypes.byref(fcost), grad.ctypes.data_as(POINTER(c_float)),
-                           d.ctypes.data_as(POINTER(c_float)),
-                           hd.ctypes.data_as(POINTER(c_float)), ctypes.byref(self.udf),
-                           ctypes.byref(flag), lb_pass, ub_pass)
+                         ctypes.byref(fcost), grad.ctypes.data_as(POINTER(c_float)),
+                         d.ctypes.data_as(POINTER(c_float)),
+                         hd.ctypes.data_as(POINTER(c_float)), ctypes.byref(self.udf),
+                         ctypes.byref(flag), lb_pass, ub_pass)
 
-    def PTRN(self, n, x, fcost, grad, grad_preco, residual, residual_precod, d, hd, flag,
+    def PTRN(self, n, x, fcost, grad, grad_preco, residual, residual_preco, d, hd, flag,
              lb=None, ub=None):
         lb_pass = lb.ctypes.data_as(POINTER(c_float)) if lb is not None else lb
         ub_pass = ub.ctypes.data_as(POINTER(c_float)) if ub is not None else ub
         self._ctypes_ptrn(ctypes.byref(n), x.ctypes.data_as(POINTER(c_float)),
-                           ctypes.byref(fcost), grad.ctypes.data_as(POINTER(c_float)),
-                           grad_preco.ctypes.data_as(POINTER(c_float)),
-                           residual.ctypes.data_as(POINTER(c_float)),
-                           residual_preco.ctypes.data_as(POINTER(c_float)),
-                           d.ctypes.data_as(POINTER(c_float)),
-                           hd.ctypes.data_as(POINTER(c_float)), ctypes.byref(self.udf),
-                           ctypes.byref(flag), lb_pass, ub_pass)
-
+                          ctypes.byref(fcost), grad.ctypes.data_as(POINTER(c_float)),
+                          grad_preco.ctypes.data_as(POINTER(c_float)),
+                          residual.ctypes.data_as(POINTER(c_float)),
+                          residual_preco.ctypes.data_as(POINTER(c_float)),
+                          d.ctypes.data_as(POINTER(c_float)),
+                          hd.ctypes.data_as(POINTER(c_float)), ctypes.byref(self.udf),
+                          ctypes.byref(flag), lb_pass, ub_pass)

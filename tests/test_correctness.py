@@ -12,7 +12,7 @@ from ctypes import c_int, c_float, c_bool, POINTER
 test_dir = os.path.dirname(os.path.realpath(__file__))
 root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 exe_dir = os.path.join(test_dir, '..', 'bin')
-exe_filenames = ['./'+file for file in os.listdir(exe_dir) if file.startswith("test")]
+exe_filenames = ['./' + file for file in os.listdir(exe_dir) if file.startswith("test")]
 
 
 def SafeExtern(mycmd, rundir):

@@ -133,6 +133,7 @@ def lsm_gradient(x):
 
     return c_float(objective), grad.data.flatten().astype(c_float)
 
+
 words = ['PSTD', 'PNLCG', 'LBFGS']
 a_3d_array = np.zeros((model.grid.shape[0], model.grid.shape[1], 3))
 
@@ -264,4 +265,3 @@ for ax in (ax1, ax2, ax3, ax4):
     ax.label_outer()
 
 plt.savefig('true_aniso.pdf')
-

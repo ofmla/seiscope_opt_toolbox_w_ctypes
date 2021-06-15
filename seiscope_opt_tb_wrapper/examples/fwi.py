@@ -2,7 +2,6 @@
 # coding: utf-8
 
 import pathmagic  # noqa
-import os
 import numpy as np
 
 from examples.seismic import demo_model
@@ -255,6 +254,7 @@ def main(c):
 
     plt.savefig('circle_isotropic_inversion.pdf')
 
+
 if __name__ == "__main__":
     r'''
     This script demonstrates how we can set up a basic FWI framework
@@ -270,4 +270,3 @@ if __name__ == "__main__":
     cluster = LocalCluster(n_workers=5, death_timeout=600, asynchronous=False)
     c = Client(cluster)
     main(c)
-
