@@ -48,8 +48,8 @@ jobs:
 
     - name: Compile
       run: |
-      	FoBiS.py build -f seiscope_opt_toolbox_w_ctypes.fobis -mode shared-gnu
-      	FoBis.py build -f seiscope_opt_toolbox_w_ctypes.fobis -mode tests-gnu
+        FoBiS.py build -f seiscope_opt_toolbox_w_ctypes.fobis -mode shared-gnu
+        FoBis.py build -f seiscope_opt_toolbox_w_ctypes.fobis -mode tests-gnu
 
     - name: Test with pytest
       run: py.test -vs tests
