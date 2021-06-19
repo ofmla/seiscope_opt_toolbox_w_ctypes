@@ -28,8 +28,9 @@ plt.plot(myDict['LB'], fillstyle='none', linestyle='-', marker='s',
 plt.xlabel('Iterations')
 plt.ylabel('Relative objective function (log scale)')
 plt.yscale('log')
-plt.grid(linestyle=':', linewidth=0.5)
+plt.grid(True, which="both", linestyle=':', linewidth=0.5)
 plt.legend(loc='upper right', frameon=True, prop={'size': 10})
+plt.tight_layout() 
 plt.savefig('convergence_curves.svg')
 #
 nwDict = {}
@@ -56,6 +57,7 @@ plt.plot(nwDict['LB'], myDict['LB'], fillstyle='none', linestyle='-', marker='s'
 plt.xlabel('Computed gradients')
 plt.ylabel('Relative objective function (log scale)')
 plt.yscale('log')
-plt.grid(linestyle=':', linewidth=0.5)
+plt.grid(True, which="both", linestyle=':', linewidth=0.5)
 plt.legend(loc='upper right', frameon=True, prop={'size': 10})
+plt.tight_layout() 
 plt.savefig('computationalcost_curves.svg')
