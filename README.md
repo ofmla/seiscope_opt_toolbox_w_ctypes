@@ -20,7 +20,7 @@ It is also possible to build the library in static form and the `tests` programs
 
 The examples can be run after the shared object has been built to test that wrapper works as it should. Note that you must have [Devito](https://www.devitoproject.org/) installed to run the examples. A python script `plot_curves.py` is also provide in the `python` directory. Please note that it may not be the best implementation and is intended for illustrative purposes only. The following figures were obtained with the `plot_curves.py` script after ran one of the examples.
 
-<img src="https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes/blob/main/src/python/computationalcost_curves.svg" width="425"/> <img src="https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes/blob/main/src/python/convergence_curves.svg" width="425"/> 
+<img src="./seiscope_opt_tb_wrapper/examples/computationalcost_curves.svg" width="425"/> <img src="./seiscope_opt_tb_wrapper/examples/convergence_curves.svg" width="425"/> 
 
 See also
 ------
