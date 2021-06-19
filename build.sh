@@ -7,7 +7,7 @@
 #
 
 MODCODE='seiscope_optimization_toolbox.f90'    # module file name
-LIBOUT='libOPTIM.a'           # name of library
+LIBOUT='libOPTIM.a'             # name of library
 DOCDIR='./doc/'                 # build directory for documentation
 SRCDIR='./src/'                 # library source directory
 TESTSRCDIR='./src/tests/'       # unit test source directory

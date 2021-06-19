@@ -87,7 +87,7 @@ subroutine descent_TRN(n,grad,d,Hd,optim,FLAG)
      optim%norm_residual = norm2(residual)
      optim%conv_CG=.false.    
      optim%cpt_iter_CG=0
-     call print_info_TRN(n,optim,0e0,FLAG)     
+     call print_info_TRN(optim,0e0,FLAG)     
      optim%CG_phase=1
   else                         
      !-----------------------------------------------------!
@@ -171,7 +171,7 @@ subroutine descent_TRN(n,grad,d,Hd,optim,FLAG)
         !-----------------------------------------------------!
         ! Print information on the current CG iteration       !
         !-----------------------------------------------------!
-        call print_info_TRN(n,optim,0e0,FLAG)     
+        call print_info_TRN(optim,0e0,FLAG)     
      endif
   endif
   
@@ -188,10 +188,7 @@ end subroutine descent_TRN
 !---------------------------------------------!
 subroutine finalize_TRN()
   
-  implicit none
-  
-  !IN/OUT
-  type(optim_type) :: optim !data structure   
+  implicit none   
   
   deallocate(xk)
   deallocate(descent)
@@ -269,8 +266,6 @@ subroutine init_TRN(n,x,fcost,grad,optim)
   real,dimension(n) :: x,grad
   !IN/OUT
   type(optim_type) :: optim !data structure   
-  !Local variable
-  real,dimension(:),allocatable :: mgrad
   
   !---------------------------------------!
   ! set counters                          !
@@ -334,13 +329,12 @@ end subroutine init_TRN
 !         character*4 FLAG communication flag         !
 ! INPUT/OUTPUT : optim_type optim (data structure)    !
 !-----------------------------------------------------!
-subroutine print_info_TRN(n,optim,fcost,FLAG)
+subroutine print_info_TRN(optim,fcost,FLAG)
 
   implicit none
 
   !IN
   integer  :: flag
-  integer :: n
   real :: fcost
   type(optim_type) :: optim !data structure   
 
@@ -526,7 +520,6 @@ subroutine TRN(n,x,fcost,grad,d,Hd,optim,FLAG,lb,ub)
   real(c_float),optional, dimension(n) :: lb,ub 
   !Local variable
   logical :: test_conv
-  real :: norm_x,norm_descent
   
 
   if(FLAG.eq. 0) then
@@ -535,7 +528,7 @@ subroutine TRN(n,x,fcost,grad,d,Hd,optim,FLAG,lb,ub)
      ! subroutine to allocate data structure optim         !
      !-----------------------------------------------------!
      call init_TRN(n,x,fcost,grad,optim)     
-     call print_info_TRN(n,optim,fcost,FLAG)     
+     call print_info_TRN(optim,fcost,FLAG)     
      optim%comm=0     
      optim%CG_phase=0
      optim%nfwd_pb=optim%nfwd_pb+1
@@ -581,12 +574,12 @@ subroutine TRN(n,x,fcost,grad,d,Hd,optim,FLAG,lb,ub)
         !Compute the new gradient norm 
         optim%norm_grad = norm2(grad)        
         !Print info on current nonlinear iteration
-        call print_info_TRN(n,optim,fcost,FLAG)        
+        call print_info_TRN(optim,fcost,FLAG)        
         !Test for convergence
         call std_test_conv(optim,fcost,test_conv)
         if(test_conv) then
            FLAG=2          
-           call print_info_TRN(n,optim,fcost,FLAG)        
+           call print_info_TRN(optim,fcost,FLAG)        
            close(10)
            close(21)           
            call finalize_TRN()
@@ -611,7 +604,7 @@ subroutine TRN(n,x,fcost,grad,d,Hd,optim,FLAG,lb,ub)
         ! has failed, the iterations are stopped              !
         !-----------------------------------------------------!
         FLAG=4
-        call print_info_TRN(n,optim,fcost,FLAG)
+        call print_info_TRN(optim,fcost,FLAG)
         close(10)
         close(21)
         call finalize_TRN()

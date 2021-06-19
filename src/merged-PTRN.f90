@@ -113,12 +113,11 @@ end subroutine descent_PTRN0
 !         character*4 FLAG communication flag         !
 ! INPUT/OUTPUT : optim_type optim (data structure)    !
 !-----------------------------------------------------!
-subroutine descent_PTRN1(n,grad,residual,residual_preco,d,Hd,optim,FLAG)
+subroutine descent_PTRN1(n,grad,residual,residual_preco,d,Hd,optim)
   
   implicit none
   
   !IN
-  integer :: FLAG                            !communication FLAG
   integer :: n                               !dimension of the problem
   real,dimension(n) :: grad                  !gradient at current point
   real,dimension(n) :: d, Hd 
@@ -259,10 +258,7 @@ end subroutine descent_PTRN2
 !---------------------------------------------!
 subroutine finalize_PTRN()
   
-  implicit none
-  
-  !IN/OUT
-  type(optim_type) :: optim !data structure   
+  implicit none   
   
   deallocate(xk)
   deallocate(descent)
@@ -552,7 +548,6 @@ subroutine PTRN(n,x,fcost,grad,grad_preco,residual,residual_preco, &
   real(c_float),optional, dimension(n) :: lb,ub 
   !Local variable
   logical :: test_conv
-  real :: norm_x,norm_descent
   
   if(FLAG.eq. 0) then
      !-----------------------------------------------------!
@@ -589,7 +584,7 @@ subroutine PTRN(n,x,fcost,grad,grad_preco,residual,residual_preco, &
         ! if optim%CG_phase is IRUN, iterate the conjugate    !
         ! gradient process (first part)                       !
         !-----------------------------------------------------!
-        call descent_PTRN1(n,grad,residual,residual_preco,d,Hd,optim,FLAG)    
+        call descent_PTRN1(n,grad,residual,residual_preco,d,Hd,optim)    
         if(optim%conv_CG) then 
            !-----------------------------------------------------!
            ! if the conjugate gradient has already converged     ! 

@@ -10,11 +10,13 @@ modes = static-gnu static-gnu-debug
 $MOD_FILE    = seiscope_optimization_toolbox.f90
 $STATIC_LIB  = libOPTIM.a
 $SHARED_LIB  = libOPTIM.so
-$OPTIMIZE    = -O2 -fno-underscoring -fPIC
+$OPTIMIZE    = -O2 
 $CSTATIC_GNU = -c -fbacktrace -Wall -Wextra -Wno-maybe-uninitialized -Wno-unused-function -pedantic -std=f2008ts
+$CSHARED_GNU = -c -fbacktrace -Wall -Wextra -Wno-maybe-uninitialized -Wno-unused-function -pedantic -std=f2008ts -fPIC
 $DEBUG_GNU   = -O0 -g3 -Warray-bounds -Wcharacter-truncation -Wline-truncation -Wimplicit-interface -Wimplicit-procedure -Wunderflow -fcheck=all -fmodule-private -ffree-line-length-132 -fimplicit-none -fbacktrace -fdump-core -finit-real=nan -std=f2008ts -fall-intrinsics
-$CSTATIC_INT = -c -std15
-$DEBUG_INT   = -O0 -debug all -check all -warn all -extend-source 132 -traceback -gen-interfaces -fpe-all=0 -fp-stack-check -fstack-protector-all -ftrapuv -no-ftz -std15
+$CSTATIC_INT = -c -stand f08
+$CSHARED_INT = -c -stand f08 -fPIC
+$DEBUG_INT   = -O0 -debug all -check all -warn all -extend-source 132 -traceback -gen-interfaces -fpe-all=0 -fp-stack-check -fstack-protector-all -ftrapuv -no-ftz -stand f18
 
 
 # modes templates
@@ -87,25 +89,25 @@ template        = template-static
 [shared-gnu]
 description     = Build library with GNU gfortran by optimized-shared flags
 compiler        = gnu
-cflags          = $CSTATIC_GNU $OPTIMIZE
+cflags          = $CSHARED_GNU $OPTIMIZE
 template        = template-shared
 
 [shared-gnu-debug]
 description     = Build library with GNU gfortran by debug-shared flags
 compiler        = gnu
-cflags          = $CSTATIC_GNU $DEBUG_GNU
+cflags          = $CSHARED_GNU $DEBUG_GNU
 template        = template-shared
 
 [shared-intel]
 description     = Build library with Intel Fortran by optimized-shared flags
 compiler        = intel
-cflags          = $CSTATIC_INT $OPTIMIZE
+cflags          = $CSHARED_INT $OPTIMIZE
 template        = template-shared
 
 [shared-intel-debug]
 description     = Build library with Intel Fortran by debug-shared flags
 compiler        = intel
-cflags          = $CSTATIC_INT $DEBUG_INT
+cflags          = $CSHARED_INT $DEBUG_INT
 template        = template-shared
 
 # test programs
