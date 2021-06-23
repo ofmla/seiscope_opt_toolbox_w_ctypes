@@ -1,3 +1,34 @@
+!******************************************************************
+!Copyright 2013-2016 SEISCOPE II project, All rights reserved.
+!
+!Redistribution and use in source and binary forms, with or
+!without modification, are permitted provided that the following
+!conditions are met:
+!
+!    *  Redistributions of source code must retain the above copyright
+!       notice, this list of conditions and the following disclaimer.
+!    *  Redistributions in binary form must reproduce the above
+!       copyright notice, this list of conditions and the following
+!       disclaimer in the documentation and/or other materials provided
+!       with the distribution.
+!    *  Neither the name of the SEISCOPE project nor the names of
+!       its contributors may be used to endorse or promote products
+!       derived from this software without specific prior written permission.
+!
+!Warranty Disclaimer:
+!THIS SOFTWARE IS PROVIDED BY THE SEISCOPE PROJECT AND CONTRIBUTORS
+!"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+!LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+!FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+!SEISCOPE PROJECT OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+!INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+!BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+!LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+!CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+!STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+!IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+!POSSIBILITY OF SUCH DAMAGE.
+
 !*****************************************************!
 !*          SEISCOPE OPTIMIZATION TOOLBOX            *!
 !*****************************************************!
@@ -76,7 +107,6 @@
 !-----------------------------------------------------!
 program test_PTRN
   !use typedef
-  !use rosenbrock_module
   !use opt_PTRN
   use seiscope_optimization_toolbox
   implicit none  
@@ -87,7 +117,7 @@ program test_PTRN
   real,dimension(:),allocatable :: grad       ! current gradient
   real,dimension(:),allocatable :: grad_preco ! preconditioned current gradient
   real,dimension(:),allocatable :: d, Hd
-  real,dimension(:),allocatable :: residual1,residual_preco
+  real,dimension(:),allocatable :: residual,residual_preco
   type(optim_type) :: optim                   ! data structure for the optimizer
   !character*4 :: FLAG                         ! communication FLAG 
   integer :: FLAG                             ! communication FLAG
@@ -110,7 +140,7 @@ program test_PTRN
   ! intial guess                                       !
   !----------------------------------------------------!
   allocate(x(n),grad(n),grad_preco(n),d(n),Hd(n))
-  allocate(residual1(n),residual_preco(n))
+  allocate(residual(n),residual_preco(n))
   x(1)=1.5
   x(2)=1.5
   
@@ -133,7 +163,7 @@ program test_PTRN
   !----------------------------------------------------!
   !do while ((FLAG.ne.'CONV').and.(FLAG.ne.'FAIL'))
   do while ((FLAG.ne.2).and.(FLAG.ne.4)) 
-     call PTRN(n,x,fcost,grad,grad_preco,residual1,residual_preco, &
+     call PTRN(n,x,fcost,grad,grad_preco,residual,residual_preco, &
      		   d,Hd,optim,FLAG)
      !if(FLAG.eq.'GRAD') then   
      if(FLAG.eq. 1) then                   
@@ -157,7 +187,7 @@ program test_PTRN
         ! preconditioner and store the result in             !
         ! optim%residual_preco                               !
         !----------------------------------------------------!
-        residual_preco(:)=residual1(:)
+        residual_preco(:)=residual(:)
      endif
   enddo
   
