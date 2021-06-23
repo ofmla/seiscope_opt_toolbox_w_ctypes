@@ -2,6 +2,7 @@
 *.o
 *.mod
 *.dat
+*.log
 
 # Ignore pdf files
 *.pdf
