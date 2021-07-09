@@ -8,6 +8,7 @@
 *.pdf
 
 # Ignore directories created
+.ipynb_checkpoints
 bin/
 lib/
 tests/__pycache__
