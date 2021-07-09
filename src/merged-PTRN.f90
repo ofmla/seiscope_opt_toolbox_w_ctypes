@@ -43,7 +43,7 @@ public PTRN
 contains
 
 subroutine ptrn_centry(n,x,fcost,grad,grad_preco,residual,residual_preco, &
-					   d,Hd,optim,flag,lb,ub) bind(c, name='PTRN')
+                       d,Hd,optim,flag,lb,ub) bind(c, name='PTRN')
   !IN
   integer(c_int)  :: n                 !dimension of the problem
   real(c_float)   :: fcost             !cost associated with x
@@ -62,7 +62,7 @@ subroutine ptrn_centry(n,x,fcost,grad,grad_preco,residual,residual_preco, &
   if (c_associated(ub)) call c_f_pointer(ub, ub_pass, (/n/))
   if (c_associated(lb)) call c_f_pointer(lb, lb_pass, (/n/))
   call ptrn(n,x,fcost,grad,grad_preco,residual,residual_preco, &
-			d,Hd,optim,flag,lb_pass,ub_pass)
+            d,Hd,optim,flag,lb_pass,ub_pass)
 end subroutine ptrn_centry
 
 !*****************************************************!
@@ -328,7 +328,8 @@ subroutine init_PTRN(n,x,fcost,grad,optim)
   optim%f0=fcost
   optim%nfwd_pb=0
   optim%nhess=0
-  optim%eta=0.9  
+  optim%eta=0.9 
+  optim%cpt_iter_CG=0 
   !optim%eta=0.1
   
   !---------------------------------------!
@@ -562,7 +563,7 @@ end subroutine print_info_PTRN
 !                character*4 FLAG (communication)     !
 !-----------------------------------------------------!
 subroutine PTRN(n,x,fcost,grad,grad_preco,residual,residual_preco, &
-				d,Hd,optim,FLAG,lb,ub)
+                d,Hd,optim,FLAG,lb,ub)
   
   implicit none
   
@@ -606,7 +607,7 @@ subroutine PTRN(n,x,fcost,grad,grad_preco,residual,residual_preco, &
         ! conjugate gradient process
         !-----------------------------------------------------!
         call descent_PTRN0(n,grad,grad_preco,residual,residual_preco,&
-    					   d,Hd,optim,FLAG)  
+                           d,Hd,optim,FLAG)  
         optim%CG_phase=1
         optim%comm=1
         FLAG=7

@@ -1,6 +1,6 @@
 ![Build Status](https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes/actions/workflows/CI.yml/badge.svg)
 
-The SEISCOPE optimization toolbox using Ctypes
+sotb-wrapper: A Python wrapper for the SEISCOPE optimization toolbox (using Ctypes)
 ----------------------------------------------
 
 This repo demonstrates how it is possible to use the [SEISCOPE optimization toolbox](https://seiscope2.osug.fr/SEISCOPE-OPTIMIZATION-TOOLBOX?lang=fr) (written in Fortran) from Python. The original code is public domain and was written by Ludovic Métivier

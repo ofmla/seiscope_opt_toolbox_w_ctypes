@@ -93,6 +93,7 @@ program test_PLBFGS
   real,dimension(:),allocatable :: x          ! current point
   real,dimension(:),allocatable :: grad       ! current gradient
   real,dimension(:),allocatable :: grad_preco ! preconditioned gradient (1st iteration only)
+  real,dimension(:),allocatable :: q_plb
   type(optim_type) :: optim                   ! data structure for the optimizer
   !character*4 :: FLAG                         ! communication FLAG 
   integer :: FLAG                             ! communication FLAG
@@ -113,7 +114,7 @@ program test_PLBFGS
   !----------------------------------------------------!
   ! intial guess                                       !
   !----------------------------------------------------!
-  allocate(x(n),grad(n),grad_preco(n))
+  allocate(x(n),grad(n),grad_preco(n),q_plb(n))
   x(1)=1.5
   x(2)=1.5
   
@@ -130,14 +131,14 @@ program test_PLBFGS
   !----------------------------------------------------!
   !do while ((FLAG.ne.'CONV').and.(FLAG.ne.'FAIL'))
   do while ((FLAG.ne.2).and.(FLAG.ne.4)) 
-     call PLBFGS(n,x,fcost,grad,grad_preco,optim,FLAG)
+     call PLBFGS(n,x,fcost,grad,grad_preco,q_plb,optim,FLAG)
      !if(FLAG.eq.'GRAD') then 
      if(FLAG.eq. 1) then                 
         call Rosenbrock(x,fcost,grad)        
      endif
      !if(FLAG.eq.'PREC') then
      if(FLAG.eq. 5) then
-        !apply preconditioning to optim%q_plb
+        !apply preconditioning to q_plb
         !if nothing is done, PLBFGS is equivalent to LBFGS
      endif
   enddo

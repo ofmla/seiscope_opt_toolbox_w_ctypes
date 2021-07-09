@@ -164,7 +164,7 @@ program test_PTRN
   !do while ((FLAG.ne.'CONV').and.(FLAG.ne.'FAIL'))
   do while ((FLAG.ne.2).and.(FLAG.ne.4)) 
      call PTRN(n,x,fcost,grad,grad_preco,residual,residual_preco, &
-     		   d,Hd,optim,FLAG)
+               d,Hd,optim,FLAG)
      !if(FLAG.eq.'GRAD') then   
      if(FLAG.eq. 1) then                   
         !----------------------------------------------------!

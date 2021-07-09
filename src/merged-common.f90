@@ -268,7 +268,6 @@ subroutine std_linesearch(n,x,fcost,grad,xk,descent,optim,lb,ub) !lb,ub,optim
   type(optim_type) :: optim
   !Local variables
   real :: q0,new_alpha
-  logical :: alpha_R_iszero
     
   if(optim%first_ls) then
      !---------------------------------------!
@@ -276,12 +275,10 @@ subroutine std_linesearch(n,x,fcost,grad,xk,descent,optim,lb,ub) !lb,ub,optim
      !---------------------------------------!
      optim%fk=fcost
      q0 = dot_product(grad,descent)
-     !print*,q0
      optim%q0=q0
      !set the search interval bounds to 0
      optim%alpha_L=0.
      optim%alpha_R=0.
-     alpha_R_iszero = .true.          
      optim%task=1
      optim%first_ls=.false.
      xk(:)=x(:)
@@ -354,7 +351,6 @@ subroutine std_linesearch(n,x,fcost,grad,xk,descent,optim,lb,ub) !lb,ub,optim
            endif
         endif
         optim%alpha_R=optim%alpha
-        alpha_R_iszero = .false.
         new_alpha=(optim%alpha_L+optim%alpha_R)/2.
         optim%alpha=new_alpha        
         optim%task=1

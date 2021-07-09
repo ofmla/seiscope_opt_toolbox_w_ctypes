@@ -37,16 +37,17 @@ use opt_PSTD, only : xk, descent
 use opt_LBFGS, only : save_LBFGS, update_LBFGS, sk, yk
 
 private
-real, allocatable, dimension(:) :: q_plb,alpha_plb,rho_plb
+real, allocatable, dimension(:) :: alpha_plb,rho_plb
 public PLBFGS
 
 contains
 
-subroutine plbfgs_centry(n,x,fcost,grad,grad_preco,optim,flag,lb,ub) bind(c, name='PLBFGS')
+subroutine plbfgs_centry(n,x,fcost,grad,grad_preco,q_plb,optim,flag,lb,ub) bind(c, name='PLBFGS')
   !IN
   integer(c_int)  :: n                           !dimension of the problem
   real(c_float)   :: fcost                       !cost associated with x
   real(c_float),dimension(n) :: grad,grad_preco !gradient and preconditioned gradient at x 
+  real(c_float),dimension(n) :: q_plb
   !IN/OUT  
   integer(c_int)  :: flag
   real(c_float),dimension(n) :: x               !current point
@@ -58,7 +59,7 @@ subroutine plbfgs_centry(n,x,fcost,grad,grad_preco,optim,flag,lb,ub) bind(c, nam
   nullify(ub_pass)
   if (c_associated(ub)) call c_f_pointer(ub, ub_pass, (/n/))
   if (c_associated(lb)) call c_f_pointer(lb, lb_pass, (/n/))
-  call plbfgs(n,x,fcost,grad,grad_preco,optim,flag,lb_pass,ub_pass)
+  call plbfgs(n,x,fcost,grad,grad_preco,q_plb,optim,flag,lb_pass,ub_pass)
 end subroutine plbfgs_centry
 
 !*****************************************************!
@@ -86,13 +87,13 @@ end subroutine plbfgs_centry
 !         integer l maximum number of stored pairs    !
 ! OUTPUT : real,dimension(n) descent                  !
 !-----------------------------------------------------!
-subroutine descent1_PLBFGS(n,grad,sk,yk,cpt_lbfgs,l)
+subroutine descent1_PLBFGS(n,grad,sk,yk,cpt_lbfgs,l,q_plb)
   
   implicit none
 
   !IN
   integer :: n,cpt_lbfgs,l
-  real,dimension(n) :: grad
+  real,dimension(n) :: grad, q_plb
   real,dimension(n,l) :: sk,yk
   !Local variables
   integer :: i,borne_i
@@ -123,7 +124,7 @@ end subroutine descent1_PLBFGS
 !         integer l maximum number of stored pairs    !
 ! OUTPUT : real,dimension(n) descent                  !
 !-----------------------------------------------------!
-subroutine descent2_PLBFGS(n,sk,yk,cpt_lbfgs,l,descent)
+subroutine descent2_PLBFGS(n,sk,yk,cpt_lbfgs,l,descent,q_plb)
   
   implicit none
   
@@ -131,7 +132,7 @@ subroutine descent2_PLBFGS(n,sk,yk,cpt_lbfgs,l,descent)
   integer :: n,cpt_lbfgs,l
   real,dimension(n,l) :: sk,yk
   !IN/OUT
-  real,dimension(n) :: descent
+  real,dimension(n) :: descent, q_plb
   !Local variables
   real :: beta,gamma,gamma_num,gamma_den
   integer :: i,borne_i
@@ -167,7 +168,6 @@ subroutine finalize_PLBFGS()
   deallocate(descent)
   deallocate(sk)
   deallocate(yk)  
-  deallocate(q_plb)
   
 end subroutine finalize_PLBFGS
 !*****************************************************!
@@ -232,7 +232,6 @@ subroutine init_PLBFGS(n,l,x,fcost,grad,grad_preco,optim)
   allocate(sk(n,l),yk(n,l))
   sk(:,:)=0.
   yk(:,:)=0.
-  allocate(q_plb(n))
   
   !---------------------------------------!
   ! first descent direction               !
@@ -303,7 +302,7 @@ end subroutine init_PLBFGS
 !                optim_typ optim (data structure)     !
 !                character*4 FLAG (communication)     !
 !-----------------------------------------------------!
-subroutine PLBFGS(n,x,fcost,grad,grad_preco,optim,flag,lb,ub)
+subroutine PLBFGS(n,x,fcost,grad,grad_preco,q_plb,optim,flag,lb,ub)
   
   implicit none
   
@@ -312,6 +311,7 @@ subroutine PLBFGS(n,x,fcost,grad,grad_preco,optim,flag,lb,ub)
   real :: fcost                          !cost associated with x
   real,dimension(n) :: grad              !associated gradient 
   real,dimension(n) :: grad_preco        !preconditioned gradient (first iteration only) 
+  real,dimension(n) :: q_plb
   !IN/OUT  
   integer  :: flag
   real,dimension(n) :: x          !current point
@@ -338,7 +338,7 @@ subroutine PLBFGS(n,x,fcost,grad,grad_preco,optim,flag,lb,ub)
      ! computation of the descent direction                !
      !-----------------------------------------------------!
      call descent2_PLBFGS(n,sk,yk,optim%cpt_lbfgs,&
-          optim%l,descent)         
+          optim%l,descent,q_plb)         
      !LBFGS save
      call save_LBFGS(n,optim%cpt_lbfgs,optim%l,x,grad,sk,yk)
      optim%cpt_iter=optim%cpt_iter+1        
@@ -365,7 +365,7 @@ subroutine PLBFGS(n,x,fcost,grad,grad_preco,optim,flag,lb,ub)
         !LBFGS update        
         call update_LBFGS(n,optim%cpt_lbfgs,optim%l,x,grad,sk,yk)
         !Start the computation of the new descent direction
-        call descent1_PLBFGS(n,grad,sk,yk,optim%cpt_lbfgs,optim%l)         
+        call descent1_PLBFGS(n,grad,sk,yk,optim%cpt_lbfgs,optim%l,q_plb)         
         !Set FLAG to PREC for asking user to perform preconditioning 
         FLAG=5                        
      elseif(optim%task.eq. 1) then 

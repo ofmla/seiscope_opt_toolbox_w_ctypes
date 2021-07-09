@@ -101,7 +101,27 @@ here = os.path.dirname(os.path.abspath(__file__))
 lib_file = os.path.join(here, '..', 'lib', 'libOPTIM.so')
 
 # This is how a dll/so library is loaded
-lib_sotb = ctypes.cdll.LoadLibrary(lib_file)
+try:
+
+	lib_sotb = ctypes.cdll.LoadLibrary(lib_file)
+
+except Exception as e:
+
+	import logging
+	logger = logging.Logger("catch_all")
+	logger.error(e, exc_info=True)
+	print()
+	print("Failed to load the required SEISCOPE OPTIMIZATION TOOLBOX (sotb) " + "\n"
+		  + "shared library. You can likely resolve this error by building " + "\n"
+		  + "the required sotb shared library on your linux system. " + "\n"
+		  + "\n"
+		  + "Visit" + "\n"
+		  + "\n"
+		  + "    " + "https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes#compiling" + "\n"
+		  + "\n"
+		  + "for instructions to build the sotb library on your linux system. " + "\n"
+		 )
+	print()
 
 
 class sotb_wrapper(object):
@@ -124,7 +144,7 @@ class sotb_wrapper(object):
     _ctypes_pnlcg.restype = None
 
     _ctypes_plbfgs.argtypes = [POINTER(c_int), POINTER(c_float), POINTER(c_float),
-                               POINTER(c_float), POINTER(c_float),
+                               POINTER(c_float), POINTER(c_float), POINTER(c_float),
                                POINTER(UserDefined), POINTER(c_int), POINTER(c_float),
                                POINTER(c_float)]
     _ctypes_plbfgs.restype = None
@@ -166,12 +186,13 @@ class sotb_wrapper(object):
                            grad_preco.ctypes.data_as(POINTER(c_float)),
                            ctypes.byref(self.udf), ctypes.byref(flag), lb_pass, ub_pass)
 
-    def PLBFGS(self, n, x, fcost, grad, grad_preco, flag, lb=None, ub=None):
+    def PLBFGS(self, n, x, fcost, grad, grad_preco, q_plb, flag, lb=None, ub=None):
         lb_pass = lb.ctypes.data_as(POINTER(c_float)) if lb else lb
         ub_pass = ub.ctypes.data_as(POINTER(c_float)) if ub else ub
         self._ctypes_plbfgs(ctypes.byref(n), x.ctypes.data_as(POINTER(c_float)),
                             ctypes.byref(fcost), grad.ctypes.data_as(POINTER(c_float)),
                             grad_preco.ctypes.data_as(POINTER(c_float)),
+                            q_plb.ctypes.data_as(POINTER(c_float)),
                             ctypes.byref(self.udf), ctypes.byref(flag), lb_pass, ub_pass)
 
     def LBFGS(self, n, x, fcost, grad, flag, lb=None, ub=None):
