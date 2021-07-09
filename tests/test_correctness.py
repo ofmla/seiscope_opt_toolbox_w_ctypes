@@ -144,7 +144,6 @@ def test_byte_by_byte_comp():
     http://docs.python.org/library/filecmp.html
     '''
     files1 = [file for file in os.listdir(exe_dir) if file.endswith(".dat")]
-    print(exe_dir,root_dir)
     files2 = [file for file in os.listdir(root_dir) if file.endswith(".dat")]
     # just make sure there are some outputs
     assert len(files1) > 0

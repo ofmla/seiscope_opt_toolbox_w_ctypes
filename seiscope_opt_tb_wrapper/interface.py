@@ -103,25 +103,26 @@ lib_file = os.path.join(here, '..', 'lib', 'libOPTIM.so')
 # This is how a dll/so library is loaded
 try:
 
-	lib_sotb = ctypes.cdll.LoadLibrary(lib_file)
+    lib_sotb = ctypes.cdll.LoadLibrary(lib_file)
 
 except Exception as e:
 
-	import logging
-	logger = logging.Logger("catch_all")
-	logger.error(e, exc_info=True)
-	print()
-	print("Failed to load the required SEISCOPE OPTIMIZATION TOOLBOX (sotb) " + "\n"
-		  + "shared library. You can likely resolve this error by building " + "\n"
-		  + "the required sotb shared library on your linux system. " + "\n"
-		  + "\n"
-		  + "Visit" + "\n"
-		  + "\n"
-		  + "    " + "https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes#compiling" + "\n"
-		  + "\n"
-		  + "for instructions to build the sotb library on your linux system. " + "\n"
-		 )
-	print()
+    import logging
+    logger = logging.Logger("catch_all")
+    logger.error(e, exc_info=True)
+    github_url = "https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes#compiling"
+    print()
+    print("Failed to load the required SEISCOPE OPTIMIZATION TOOLBOX (sotb) " + "\n"
+          + "shared library. You can likely resolve this error by building " + "\n"
+          + "the required sotb shared library on your linux system. " + "\n"
+          + "\n"
+          + "Visit" + "\n"
+          + "\n"
+          + "    " + github_url + "\n"
+          + "\n"
+          + "for instructions to build the sotb library on your linux system. " + "\n"
+          )
+    print()
 
 
 class sotb_wrapper(object):
