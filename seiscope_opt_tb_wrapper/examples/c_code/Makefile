@@ -13,10 +13,10 @@ RM	= rm -f
 #-----------------------------------------------------------------
 # Use the following definition to link the sample program with
 # the shared OPTIM library dynamically.  
-LIBS = -L../../seiscope_opt_toolbox_w_ctypes/lib -lOPTIM
+LIBS = -L../../../lib -lOPTIM
 #-----------------------------------------------------------------
 # The -Wl, option is used to avoid the need to set LD_LIBRARY_PATH before execution
-LFLAGS = -Wl,-rpath ../../seiscope_opt_toolbox_w_ctypes/lib $(LIBS)
+LFLAGS = -Wl,-rpath ../../../lib $(LIBS)
 
 # typing 'make' will invoke the first target entry in the file 
 # (in this case the default target entry)
