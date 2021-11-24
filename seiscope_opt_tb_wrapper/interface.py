@@ -134,34 +134,34 @@ class sotb_wrapper(object):
     _ctypes_trn = lib_sotb['TRN']
     _ctypes_ptrn = lib_sotb['PTRN']
 
-    _ctypes_pstd.argtypes = [POINTER(c_int), POINTER(c_float), POINTER(c_float),
+    _ctypes_pstd.argtypes = [c_int, POINTER(c_float), POINTER(c_float),
                              POINTER(c_float), POINTER(c_float), POINTER(UserDefined),
                              POINTER(c_int), POINTER(c_float), POINTER(c_float)]
     _ctypes_pstd.restype = None
 
-    _ctypes_pnlcg.argtypes = [POINTER(c_int), POINTER(c_float), POINTER(c_float),
+    _ctypes_pnlcg.argtypes = [c_int, POINTER(c_float), POINTER(c_float),
                               POINTER(c_float), POINTER(c_float), POINTER(UserDefined),
                               POINTER(c_int), POINTER(c_float), POINTER(c_float)]
     _ctypes_pnlcg.restype = None
 
-    _ctypes_plbfgs.argtypes = [POINTER(c_int), POINTER(c_float), POINTER(c_float),
+    _ctypes_plbfgs.argtypes = [c_int, POINTER(c_float), POINTER(c_float),
                                POINTER(c_float), POINTER(c_float), POINTER(c_float),
                                POINTER(UserDefined), POINTER(c_int), POINTER(c_float),
                                POINTER(c_float)]
     _ctypes_plbfgs.restype = None
 
-    _ctypes_lbfgs.argtypes = [POINTER(c_int), POINTER(c_float), POINTER(c_float),
+    _ctypes_lbfgs.argtypes = [c_int, POINTER(c_float), POINTER(c_float),
                               POINTER(c_float), POINTER(UserDefined), POINTER(c_int),
                               POINTER(c_float), POINTER(c_float)]
     _ctypes_lbfgs.restype = None
 
-    _ctypes_trn.argtypes = [POINTER(c_int), POINTER(c_float), POINTER(c_float),
+    _ctypes_trn.argtypes = [c_int, POINTER(c_float), POINTER(c_float),
                             POINTER(c_float), POINTER(c_float), POINTER(c_float),
                             POINTER(UserDefined), POINTER(c_int),
                             POINTER(c_float), POINTER(c_float)]
     _ctypes_trn.restype = None
 
-    _ctypes_ptrn.argtypes = [POINTER(c_int), POINTER(c_float), POINTER(c_float),
+    _ctypes_ptrn.argtypes = [c_int, POINTER(c_float), POINTER(c_float),
                              POINTER(c_float), POINTER(c_float), POINTER(c_float),
                              POINTER(c_float), POINTER(c_float), POINTER(UserDefined),
                              POINTER(c_int), POINTER(c_float), POINTER(c_float)]
@@ -174,7 +174,7 @@ class sotb_wrapper(object):
     def PSTD(self, n, x, fcost, grad, grad_preco, flag, lb=None, ub=None):
         lb_pass = lb.ctypes.data_as(POINTER(c_float)) if lb is not None else lb
         ub_pass = ub.ctypes.data_as(POINTER(c_float)) if ub is not None else ub
-        self._ctypes_pstd(ctypes.byref(n), x.ctypes.data_as(POINTER(c_float)),
+        self._ctypes_pstd(n, x.ctypes.data_as(POINTER(c_float)),
                           ctypes.byref(fcost), grad.ctypes.data_as(POINTER(c_float)),
                           grad_preco.ctypes.data_as(POINTER(c_float)),
                           ctypes.byref(self.udf), ctypes.byref(flag), lb_pass, ub_pass)
@@ -182,7 +182,7 @@ class sotb_wrapper(object):
     def PNLCG(self, n, x, fcost, grad, grad_preco, flag, lb=None, ub=None):
         lb_pass = lb.ctypes.data_as(POINTER(c_float)) if lb is not None else lb
         ub_pass = ub.ctypes.data_as(POINTER(c_float)) if ub is not None else ub
-        self._ctypes_pnlcg(ctypes.byref(n), x.ctypes.data_as(POINTER(c_float)),
+        self._ctypes_pnlcg(n, x.ctypes.data_as(POINTER(c_float)),
                            ctypes.byref(fcost), grad.ctypes.data_as(POINTER(c_float)),
                            grad_preco.ctypes.data_as(POINTER(c_float)),
                            ctypes.byref(self.udf), ctypes.byref(flag), lb_pass, ub_pass)
@@ -190,7 +190,7 @@ class sotb_wrapper(object):
     def PLBFGS(self, n, x, fcost, grad, grad_preco, q_plb, flag, lb=None, ub=None):
         lb_pass = lb.ctypes.data_as(POINTER(c_float)) if lb is not None else lb
         ub_pass = ub.ctypes.data_as(POINTER(c_float)) if ub is not None else ub
-        self._ctypes_plbfgs(ctypes.byref(n), x.ctypes.data_as(POINTER(c_float)),
+        self._ctypes_plbfgs(n, x.ctypes.data_as(POINTER(c_float)),
                             ctypes.byref(fcost), grad.ctypes.data_as(POINTER(c_float)),
                             grad_preco.ctypes.data_as(POINTER(c_float)),
                             q_plb.ctypes.data_as(POINTER(c_float)),
@@ -199,14 +199,14 @@ class sotb_wrapper(object):
     def LBFGS(self, n, x, fcost, grad, flag, lb=None, ub=None):
         lb_pass = lb.ctypes.data_as(POINTER(c_float)) if lb is not None else lb
         ub_pass = ub.ctypes.data_as(POINTER(c_float)) if ub is not None else ub
-        self._ctypes_lbfgs(ctypes.byref(n), x.ctypes.data_as(POINTER(c_float)),
+        self._ctypes_lbfgs(n, x.ctypes.data_as(POINTER(c_float)),
                            ctypes.byref(fcost), grad.ctypes.data_as(POINTER(c_float)),
                            ctypes.byref(self.udf), ctypes.byref(flag), lb_pass, ub_pass)
 
     def TRN(self, n, x, fcost, grad, d, hd, flag, lb=None, ub=None):
         lb_pass = lb.ctypes.data_as(POINTER(c_float)) if lb is not None else lb
         ub_pass = ub.ctypes.data_as(POINTER(c_float)) if ub is not None else ub
-        self._ctypes_trn(ctypes.byref(n), x.ctypes.data_as(POINTER(c_float)),
+        self._ctypes_trn(n, x.ctypes.data_as(POINTER(c_float)),
                          ctypes.byref(fcost), grad.ctypes.data_as(POINTER(c_float)),
                          d.ctypes.data_as(POINTER(c_float)),
                          hd.ctypes.data_as(POINTER(c_float)), ctypes.byref(self.udf),
@@ -216,7 +216,7 @@ class sotb_wrapper(object):
              lb=None, ub=None):
         lb_pass = lb.ctypes.data_as(POINTER(c_float)) if lb is not None else lb
         ub_pass = ub.ctypes.data_as(POINTER(c_float)) if ub is not None else ub
-        self._ctypes_ptrn(ctypes.byref(n), x.ctypes.data_as(POINTER(c_float)),
+        self._ctypes_ptrn(n, x.ctypes.data_as(POINTER(c_float)),
                           ctypes.byref(fcost), grad.ctypes.data_as(POINTER(c_float)),
                           grad_preco.ctypes.data_as(POINTER(c_float)),
                           residual.ctypes.data_as(POINTER(c_float)),
