@@ -44,7 +44,7 @@ contains
 
 subroutine trn_centry(n,x,fcost,grad,d,Hd,optim,flag,lb,ub) bind(c, name='TRN')
   !IN
-  integer(c_int)  :: n                 !dimension of the problem
+  integer(c_int), value  :: n          !dimension of the problem
   real(c_float)   :: fcost             !cost associated with x
   real(c_float),dimension(n) :: grad   !gradient and preconditioned gradient at x 
   !IN/OUT  

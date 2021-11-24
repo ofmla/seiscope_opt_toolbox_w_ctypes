@@ -43,7 +43,7 @@ contains
 subroutine lbfgs_centry(n,x,fcost,grad,optim,flag,lb,ub) bind(c, name='LBFGS')
   use, intrinsic :: iso_c_binding
   !IN
-  integer(c_int)  :: n                           !dimension of the problem
+  integer(c_int), value  :: n                    !dimension of the problem
   real(c_float)   :: fcost                       !cost associated with x
   real(c_float),dimension(n) :: grad             !gradient at x 
   !IN/OUT  

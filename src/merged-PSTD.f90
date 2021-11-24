@@ -42,7 +42,7 @@ contains
 subroutine pstd_centry(n,x,fcost,grad,grad_preco,optim,flag,lb,ub) bind(c, name='PSTD')
   use, intrinsic :: iso_c_binding
   !IN
-  integer(c_int)  :: n                           !dimension of the problem
+  integer(c_int), value  :: n                    !dimension of the problem
   real(c_float)   :: fcost                       !cost associated with x
   real(c_float),dimension(n) :: grad,grad_preco !gradient and preconditioned gradient at x 
   !IN/OUT  

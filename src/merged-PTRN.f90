@@ -45,7 +45,7 @@ contains
 subroutine ptrn_centry(n,x,fcost,grad,grad_preco,residual,residual_preco, &
                        d,Hd,optim,flag,lb,ub) bind(c, name='PTRN')
   !IN
-  integer(c_int)  :: n                 !dimension of the problem
+  integer(c_int), value  :: n          !dimension of the problem
   real(c_float)   :: fcost             !cost associated with x
   real(c_float),dimension(n) :: grad, grad_preco   !gradient and preconditioned gradient at x 
   real(c_float),dimension(n) :: residual, residual_preco  
