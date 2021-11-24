@@ -172,24 +172,24 @@ class sotb_wrapper(object):
 
     # wrapping functions for each method
     def PSTD(self, n, x, fcost, grad, grad_preco, flag, lb=None, ub=None):
-        lb_pass = lb.ctypes.data_as(POINTER(c_float)) if lb else lb
-        ub_pass = ub.ctypes.data_as(POINTER(c_float)) if ub else ub
+        lb_pass = lb.ctypes.data_as(POINTER(c_float)) if lb is not None else lb
+        ub_pass = ub.ctypes.data_as(POINTER(c_float)) if ub is not None else ub
         self._ctypes_pstd(ctypes.byref(n), x.ctypes.data_as(POINTER(c_float)),
                           ctypes.byref(fcost), grad.ctypes.data_as(POINTER(c_float)),
                           grad_preco.ctypes.data_as(POINTER(c_float)),
                           ctypes.byref(self.udf), ctypes.byref(flag), lb_pass, ub_pass)
 
     def PNLCG(self, n, x, fcost, grad, grad_preco, flag, lb=None, ub=None):
-        lb_pass = lb.ctypes.data_as(POINTER(c_float)) if lb else lb
-        ub_pass = ub.ctypes.data_as(POINTER(c_float)) if ub else ub
+        lb_pass = lb.ctypes.data_as(POINTER(c_float)) if lb is not None else lb
+        ub_pass = ub.ctypes.data_as(POINTER(c_float)) if ub is not None else ub
         self._ctypes_pnlcg(ctypes.byref(n), x.ctypes.data_as(POINTER(c_float)),
                            ctypes.byref(fcost), grad.ctypes.data_as(POINTER(c_float)),
                            grad_preco.ctypes.data_as(POINTER(c_float)),
                            ctypes.byref(self.udf), ctypes.byref(flag), lb_pass, ub_pass)
 
     def PLBFGS(self, n, x, fcost, grad, grad_preco, q_plb, flag, lb=None, ub=None):
-        lb_pass = lb.ctypes.data_as(POINTER(c_float)) if lb else lb
-        ub_pass = ub.ctypes.data_as(POINTER(c_float)) if ub else ub
+        lb_pass = lb.ctypes.data_as(POINTER(c_float)) if lb is not None else lb
+        ub_pass = ub.ctypes.data_as(POINTER(c_float)) if ub is not None else ub
         self._ctypes_plbfgs(ctypes.byref(n), x.ctypes.data_as(POINTER(c_float)),
                             ctypes.byref(fcost), grad.ctypes.data_as(POINTER(c_float)),
                             grad_preco.ctypes.data_as(POINTER(c_float)),
