@@ -30,9 +30,16 @@ A simple bash script `build.sh` is also provided for building the seiscope optim
 Usage
 -----
 
-Example run scripts are included in the [`seiscope_opt_tb_wrapper/examples`](https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes/tree/main/seiscope_opt_tb_wrapper/examples) subdirectory. The examples can be run after the shared object has been built to test that wrapper works as it should. Note that you must have [Devito](https://www.devitoproject.org/) in order to be able to run the examples. A python script `plot_curves.py` is also provide in the `examples` directory. Please note that it may not be the best implementation and is intended for illustrative purposes only. The following figures were obtained with the `plot_curves.py` script after ran one of the examples.
+Example run scripts are included in the [`seiscope_opt_tb_wrapper/examples`](https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes/tree/main/seiscope_opt_tb_wrapper/examples) subdirectory. The examples can be run after the shared object has been built to test that wrapper works as it should. Note that you must have [Devito](https://www.devitoproject.org/) in order to be able to run the examples. A python script `plot_curves.py` is also provide in the `examples` directory. Please note that it may not be the best implementation and is intended for illustrative purposes only. The following figures were obtained with the `plot_curves.py` script after ran one of the examples (`lsrtm_aniso.py`).
 
 <img src="./seiscope_opt_tb_wrapper/examples/computationalcost_curves.svg" width="425"/> <img src="./seiscope_opt_tb_wrapper/examples/convergence_curves.svg" width="425"/> 
+
+A tutorial in the form of a Jupyter notebook (`rosenbrock.ipynb`) is also supplied. The goal of the tutorial is show you how one can use sotb-wrapper to find a minimum for a problem, which can optionally be subject to bound constraints (also called box constraints). You can also find a simple example on calling the Fortran subroutines from a C main program in the [`c_code`](https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes/tree/main/seiscope_opt_tb_wrapper/examples/c_code) directory. The example uses the Limited-memory Broyden-Fletcher-Goldfarb-Shanno (L-BFGS) algorithm to minimize the Rosenbrock's "banana function".
+
+License
+-----
+
+sotb-wrapper is distributed under the MIT license. See the included [`LICENSE`](https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes/blob/main/LICENSE.md) file for details.
 
 See also
 ------
