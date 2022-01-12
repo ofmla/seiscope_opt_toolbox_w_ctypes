@@ -49,9 +49,6 @@ jobs:
       run: |
         FoBiS.py build -f seiscope_opt_toolbox_w_ctypes.fobis -mode shared-gnu
         FoBiS.py build -f seiscope_opt_toolbox_w_ctypes.fobis -mode tests-gnu
-
-    - name: execute py script # run the version.py to get the package version
-      run: python version.py
       
     - name: Test with pytest
       run: |

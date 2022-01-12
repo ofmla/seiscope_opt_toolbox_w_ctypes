@@ -19,4 +19,3 @@ sotb_wrapper/examples/dask-worker-space
 
 # Distribution / packaging
 /*.egg-info/
-RELEASE-VERSION

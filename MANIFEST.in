@@ -1,3 +1,4 @@
-include RELEASE-VERSION
-include version.py
+include versioneer.py
+include sotb_wrapper/_version.py
 # Anything else you normally use
+

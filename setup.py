@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 from setuptools import setup
-# from https://gist.github.com/mina86/8782771
-from version import getVersion
+import versioneer
 
 
 with open("README.md", "r") as fh:
@@ -12,7 +11,8 @@ configuration = {
     'packages': ["sotb-wrapper"],
     'package_dir': {'sotb-wrapper': 'sotb_wrapper'},
     'package_data': {'sotb-wrapper': ['lib/libOPTIM.so']},
-    'version': getVersion(),
+    'version': versioneer.get_version(),
+    'cmdclass': versioneer.get_cmdclass(),
     'description': "wrapper to call fortran routines from SEISCOPE optimization toolbox",
     'long_description': long_description,
     'long_description_content_type': 'text/markdown',
