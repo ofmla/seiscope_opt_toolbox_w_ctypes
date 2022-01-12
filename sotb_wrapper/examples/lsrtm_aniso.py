@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import pathmagic  # noqa
 import numpy as np
 
 from devito import configuration
@@ -16,7 +15,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
 
-from interface import sotb_wrapper
+from sotb_wrapper import interface 
 
 '''
 In this script we show a simple numerical examples for LSRTM
@@ -138,7 +137,7 @@ words = ['PSTD', 'PNLCG', 'LBFGS']
 a_3d_array = np.zeros((model.grid.shape[0], model.grid.shape[1], 3))
 
 # Create an instance of the SEISCOPE optimization toolbox (sotb) Class.
-sotb = sotb_wrapper()
+sotb = interface.sotb_wrapper()
 
 for i, word in enumerate(words):
 
@@ -149,7 +148,6 @@ for i, word in enumerate(words):
     sotb.udf.print_flag = c_int(1)  # print info in output files
     sotb.udf.debug = c_bool(False)  # level of details for output files
     sotb.udf.niter_max = c_int(25)  # maximum iteration number
-    sotb.udf.nls_max = c_int(30)    # max number of linesearch iteration
     sotb.udf.l = c_int(5)
 
     # Print the derived type.
@@ -197,7 +195,7 @@ for i, word in enumerate(words):
 
     a_3d_array[:, :, i] = np.reshape(X, model.grid.shape)
 
-
+# Plot results
 vmax = np.amax(dm[nbl:shape[0]+nbl, nbl:shape[1]+nbl])
 vmin = np.amin(dm[nbl:shape[0]+nbl, nbl:shape[1]+nbl])
 
@@ -205,63 +203,29 @@ mpl.rcParams['font.size'] = 8.5
 fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
 fig.subplots_adjust(wspace=0.2)
 fig.subplots_adjust(hspace=0.2)
-#
-im1 = ax1.imshow(dm[nbl:shape[0]+nbl, nbl:shape[1]+nbl].T, cmap=plt.cm.seismic,
-                 vmin=vmin, vmax=vmax)
-ax1_divider = make_axes_locatable(ax1)
-cax1 = ax1_divider.append_axes("right", size="7%", pad="2%")
-cb1 = plt.colorbar(im1, cax=cax1)
-cb1.ax.tick_params(labelsize=8)
-#
-im2 = ax2.imshow(a_3d_array[nbl:shape[0]+nbl, nbl:shape[1]+nbl, 0].T,
-                 cmap=plt.cm.seismic, vmin=vmin, vmax=vmax)
-ax2_divider = make_axes_locatable(ax2)
-cax2 = ax2_divider.append_axes("right", size="7%", pad="2%")
-cb2 = plt.colorbar(im2, cax=cax2)
-cb2.ax.tick_params(labelsize=8)
-#
-im3 = ax3.imshow(a_3d_array[nbl:shape[0]+nbl, nbl:shape[1]+nbl, 1].T,
-                 cmap=plt.cm.seismic, vmin=vmin, vmax=vmax)
-ax3_divider = make_axes_locatable(ax3)
-cax3 = ax3_divider.append_axes("right", size="7%", pad="2%")
-cb3 = plt.colorbar(im3, cax=cax3)
-cb3.ax.tick_params(labelsize=8)
-#
-im4 = ax4.imshow(a_3d_array[nbl:shape[0]+nbl, nbl:shape[1]+nbl, 2].T,
-                 cmap=plt.cm.seismic, vmin=vmin, vmax=vmax)
-ax4_divider = make_axes_locatable(ax4)
-cax4 = ax4_divider.append_axes("right", size="7%", pad="2%")
-cb4 = plt.colorbar(im4, cax=cax4)
-cb4.ax.tick_params(labelsize=8)
-#
 label_format = '{:,.1f}'
-ticks_ylabels = (ax1.get_yticks()*0.01).tolist()
-ticks_yloc = ax1.get_yticks().tolist()
-ticks_xlabels = (ax1.get_xticks()*0.01).tolist()
-ticks_xloc = ax1.get_xticks().tolist()
-ax1.yaxis.set_major_locator(mticker.FixedLocator(ticks_yloc))
-ax2.yaxis.set_major_locator(mticker.FixedLocator(ticks_yloc))
-ax3.yaxis.set_major_locator(mticker.FixedLocator(ticks_yloc))
-ax4.yaxis.set_major_locator(mticker.FixedLocator(ticks_yloc))
-
-ax1.xaxis.set_major_locator(mticker.FixedLocator(ticks_xloc))
-ax2.xaxis.set_major_locator(mticker.FixedLocator(ticks_xloc))
-ax3.xaxis.set_major_locator(mticker.FixedLocator(ticks_xloc))
-ax4.xaxis.set_major_locator(mticker.FixedLocator(ticks_xloc))
-
-ax1.set_yticklabels([label_format.format(x) for x in ticks_ylabels])
-ax2.set_yticklabels([label_format.format(x) for x in ticks_ylabels])
-ax3.set_yticklabels([label_format.format(x) for x in ticks_ylabels])
-ax4.set_yticklabels([label_format.format(x) for x in ticks_ylabels])
-
-ax1.set_xticklabels([label_format.format(x) for x in ticks_xlabels])
-ax2.set_xticklabels([label_format.format(x) for x in ticks_xlabels])
-ax3.set_xticklabels([label_format.format(x) for x in ticks_xlabels])
-ax4.set_xticklabels([label_format.format(x) for x in ticks_xlabels])
-
-for ax in (ax1, ax2, ax3, ax4):
+#
+for count, ax in enumerate([ax1, ax2, ax3, ax4]):
+    if count == 0:
+        im = ax.imshow(dm[nbl:shape[0]+nbl, nbl:shape[1]+nbl].T,
+                       cmap=plt.cm.seismic, vmin=vmin, vmax=vmax)
+    else:
+        im = ax.imshow(a_3d_array[nbl:shape[0]+nbl, nbl:shape[1]+nbl, count-1].T,
+                       cmap=plt.cm.seismic, vmin=vmin, vmax=vmax)
+    ax_divider = make_axes_locatable(ax)
+    cax = ax_divider.append_axes("right", size="7%", pad="2%")
+    cb = plt.colorbar(im, cax=cax)
+    cb.ax.tick_params(labelsize=8)
+    #
+    ticks_ylabels = (ax.get_yticks()*0.01).tolist()
+    ticks_yloc = ax.get_yticks().tolist()
+    ticks_xlabels = (ax.get_xticks()*0.01).tolist()
+    ticks_xloc = ax.get_xticks().tolist()
+    ax.yaxis.set_major_locator(mticker.FixedLocator(ticks_yloc))
+    ax.xaxis.set_major_locator(mticker.FixedLocator(ticks_xloc))
+    ax.set_yticklabels([label_format.format(y) for y in ticks_ylabels])
+    ax.set_xticklabels([label_format.format(x) for x in ticks_xlabels])
     ax.set(xlabel='x (km)', ylabel='Depth (km)')
-for ax in (ax1, ax2, ax3, ax4):
     ax.label_outer()
 
 plt.savefig('true_aniso.pdf')

@@ -1,11 +1,10 @@
-import pathmagic  # noqa
 import os
 import subprocess
 import sys
 import filecmp
 import numpy as np
 import ctypes
-from interface import sotb_wrapper, lib_sotb
+from sotb_wrapper import interface
 from ctypes import c_int, c_float, c_bool, POINTER
 
 
@@ -42,7 +41,7 @@ def test_run_wrapper_script():
     files were created
     '''
     # Create an instance of the SEISCOPE optimization toolbox (sotb) Class.
-    sotb = sotb_wrapper()
+    sotb = interface.sotb_wrapper()
     floatptr = POINTER(c_float)
 
     methods = ['PSTD', 'PNLCG', 'LBFGS', 'TRN']
@@ -73,8 +72,8 @@ def test_run_wrapper_script():
         d = np.zeros(n.value, dtype=np.float32)
         Hd = np.zeros(n.value, dtype=np.float32)
         fcost = c_float(0.)
-        lib_sotb.rosenbrock(X.ctypes.data_as(floatptr), ctypes.byref(fcost),
-                            grad.ctypes.data_as(floatptr))
+        interface.lib_sotb.rosenbrock(X.ctypes.data_as(floatptr), ctypes.byref(fcost),
+    								  grad.ctypes.data_as(floatptr))
 
         # copy of grad in grad_preco: no preconditioning in
         # this test
@@ -96,18 +95,18 @@ def test_run_wrapper_script():
                 sotb.TRN(n, X, fcost, grad, d, Hd, flag)
             if (flag.value == 1):
                 # compute cost and gradient at point x
-                lib_sotb.rosenbrock(X.ctypes.data_as(floatptr),
-                                    ctypes.byref(fcost),
-                                    grad.ctypes.data_as(floatptr))
+                interface.lib_sotb.rosenbrock(X.ctypes.data_as(floatptr),
+                							  ctypes.byref(fcost),
+                							  grad.ctypes.data_as(floatptr))
                 # no preconditioning in this test: simply copy grad in
                 # grad_preco
                 if method != 'LBFGS':
                     grad_preco = np.copy(grad)
             elif (flag.value == 7):
                 # compute d by the Hessian operator and store in Hd
-                lib_sotb.rosenbrock_hess(X.ctypes.data_as(floatptr),
-                                         d.ctypes.data_as(floatptr),
-                                         Hd.ctypes.data_as(floatptr))
+                interface.lib_sotb.rosenbrock_hess(X.ctypes.data_as(floatptr),
+            									   d.ctypes.data_as(floatptr),
+            									   Hd.ctypes.data_as(floatptr))
 
         # Helpful console writings
         print('END OF TEST')
