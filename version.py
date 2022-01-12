@@ -69,12 +69,14 @@ def readGitVersion():
         if proc.returncode:
             return None
         ver = data.splitlines()[0].strip()
+        print(ver)
     except:
         return None
 
     if not ver:
         return None
     m = re.search(_GIT_DESCRIPTION_RE, ver.decode('utf-8'))
+    print(m)
     if not m:
         sys.stderr.write('version: git description (%s) is invalid, '
                          'ignoring\n' % ver)
@@ -111,6 +113,8 @@ def writeReleaseVersion(version):
 
 def getVersion():
     release_version = readReleaseVersion()
+    print(release_version)
+    print(readGitVersion)
     version = readGitVersion() or release_version
     if not version:
         raise ValueError('Cannot find the version number')
