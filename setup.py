@@ -10,8 +10,8 @@ with open("README.md", "r") as fh:
 configuration = {
     'name': 'sotb-wrapper',
     'packages': ["sotb-wrapper"],
-    'package_dir':{'sotb-wrapper':'sotb_wrapper'},
-    'package_data':{'sotb-wrapper': ['lib/libOPTIM.so']},
+    'package_dir': {'sotb-wrapper': 'sotb_wrapper'},
+    'package_data': {'sotb-wrapper': ['lib/libOPTIM.so']},
     'version': getVersion(),
     'description': "wrapper to call fortran routines from SEISCOPE optimization toolbox",
     'long_description': long_description,
@@ -23,5 +23,5 @@ configuration = {
     'zip_safe': False
 }
 
-
 setup(**configuration)
+

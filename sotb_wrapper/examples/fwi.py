@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
 
-from sotb_wrapper import interface 
+from sotb_wrapper import interface
 
 
 # Serial modeling function

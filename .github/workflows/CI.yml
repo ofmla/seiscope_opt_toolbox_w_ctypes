@@ -52,5 +52,5 @@ jobs:
 
     - name: Test with pytest
       run: |
-      	pip install -e .
-      	py.test -vs tests
+        pip install -e .
+        py.test -vs tests
