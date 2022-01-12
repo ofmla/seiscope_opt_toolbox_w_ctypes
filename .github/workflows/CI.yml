@@ -22,6 +22,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
     - name: Install Python
       uses: actions/setup-python@v1 # Use pip to install latest CMake, & FORD/Jin2For, etc.
