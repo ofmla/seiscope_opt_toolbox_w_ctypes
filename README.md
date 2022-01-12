@@ -27,6 +27,17 @@ It is also possible to build the library in static form and the `tests` programs
 
 A simple bash script `build.sh` is also provided for building the seiscope optimization toolbox with gfortran using [FoBiS](https://github.com/szaghi/FoBiS). It creates the library in static form, as originally designed as well as the tests programs.
 
+Install sotb-wrapper
+-----
+
+After cloning the repo and build the dynamic library as indicated above in compiling step, you can install `sotb-wrapper` for development with `--editable`. What should follow is
+```
+git clone https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes.git
+cd seiscope_opt_toolbox_w_ctypes
+FoBiS.py build -f seiscope_opt_toolbox_w_ctypes.fobis -mode shared-gnu
+pip install -e .
+```
+
 Usage
 -----
 

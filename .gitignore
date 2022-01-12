@@ -11,7 +11,12 @@
 .ipynb_checkpoints
 bin/
 lib/
+__pycache__
 tests/__pycache__
-seiscope_opt_tb_wrapper/__pycache__
-seiscope_opt_tb_wrapper/examples/__pycache__
-seiscope_opt_tb_wrapper/examples/dask-worker-space
+sotb_wrapper/__pycache__
+sotb_wrapper/examples/__pycache__
+sotb_wrapper/examples/dask-worker-space
+
+# Distribution / packaging
+/*.egg-info/
+RELEASE-VERSION
