@@ -95,7 +95,7 @@ def readReleaseVersion():
             ver = fd.readline().strip()
         finally:
             fd.close()
-        if not re.search(_PEP386_VERSION_RE, ver):
+        if not re.search(_PEP386_VERSION_RE, ver.decode('utf-8')):
             sys.stderr.write('version: release version (%s) is invalid, '
                              'will use it anyway\n' % ver)
         return ver
