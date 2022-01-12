@@ -73,7 +73,7 @@ def test_run_wrapper_script():
         Hd = np.zeros(n.value, dtype=np.float32)
         fcost = c_float(0.)
         interface.lib_sotb.rosenbrock(X.ctypes.data_as(floatptr), ctypes.byref(fcost),
-    								  grad.ctypes.data_as(floatptr))
+                                      grad.ctypes.data_as(floatptr))
 
         # copy of grad in grad_preco: no preconditioning in
         # this test
@@ -96,8 +96,8 @@ def test_run_wrapper_script():
             if (flag.value == 1):
                 # compute cost and gradient at point x
                 interface.lib_sotb.rosenbrock(X.ctypes.data_as(floatptr),
-                							  ctypes.byref(fcost),
-                							  grad.ctypes.data_as(floatptr))
+                                              ctypes.byref(fcost),
+                                              grad.ctypes.data_as(floatptr))
                 # no preconditioning in this test: simply copy grad in
                 # grad_preco
                 if method != 'LBFGS':
@@ -105,8 +105,8 @@ def test_run_wrapper_script():
             elif (flag.value == 7):
                 # compute d by the Hessian operator and store in Hd
                 interface.lib_sotb.rosenbrock_hess(X.ctypes.data_as(floatptr),
-            									   d.ctypes.data_as(floatptr),
-            									   Hd.ctypes.data_as(floatptr))
+                                                   d.ctypes.data_as(floatptr),
+                                                   Hd.ctypes.data_as(floatptr))
 
         # Helpful console writings
         print('END OF TEST')
