@@ -20,7 +20,7 @@ def readGitVersion():
 
 
 def git_describe_run():
-    proc = sp.run(['git', 'describe', '--long', '--match', 'v[0-9]*.*'],
+    proc = sp.run(['git', 'status'],
                   capture_output=True, text=True,
                   check=True, env={"PATH": "/usr/bin"})
     print("stdout:", proc.stdout)
@@ -36,6 +36,6 @@ def get_git_revision(base_path):
         return git_hash.readline().strip()
 
 if __name__ == '__main__':
-    #print(readGitVersion())
+    print(readGitVersion())
     git_describe_run()
     print(get_git_revision(os.path.dirname(__file__)))
