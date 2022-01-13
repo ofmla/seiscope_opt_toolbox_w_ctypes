@@ -1,0 +1,25 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: sotb-wrapper
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Oscar
+    family-names: Mojica
+    email: o_mojical@hotmail.com
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.5846111
+  - type: url
+    value: >-
+      https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes
+license: MIT
+commit: 03f8403c5c46c6c29464239f42864aa08cf88710
+version: 1.0.1
+date-released: '2022-01-13'
+
+
