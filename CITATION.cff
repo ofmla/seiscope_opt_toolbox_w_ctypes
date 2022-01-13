@@ -8,18 +8,18 @@ message: >-
   metadata from this file.
 type: software
 authors:
-  - given-names: Oscar
+  - given-names: Oscar Fabian
     family-names: Mojica
     email: o_mojical@hotmail.com
 identifiers:
   - type: doi
     value: 10.5281/zenodo.5846111
+    description: The versioned DOI for version 1.0.1 of the work
   - type: url
     value: >-
-      https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes
+      https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes/releases/tag/v1.0.1
+    description: The GitHub release URL of tag 1.0.1
 license: MIT
 commit: 03f8403c5c46c6c29464239f42864aa08cf88710
 version: 1.0.1
 date-released: '2022-01-13'
-
-
