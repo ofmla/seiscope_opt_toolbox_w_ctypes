@@ -1,4 +1,5 @@
 ![Build Status](https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes/actions/workflows/CI.yml/badge.svg)
+[![DOI](https://zenodo.org/badge/341695999.svg)](https://zenodo.org/badge/latestdoi/341695999)
 
 sotb-wrapper: A Python wrapper for the SEISCOPE optimization toolbox (using Ctypes)
 ----------------------------------------------
