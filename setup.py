@@ -9,7 +9,7 @@ with open("README.md", "r") as fh:
 configuration = {
     'name': 'sotb-wrapper',
     'packages': ["sotb-wrapper"],
-    'package_dir': {'sotb-wrapper': 'sotb_wrapper'},
+    'package_dir': {'sotb-wrapper': 'sotb/wrapper'},
     'package_data': {'sotb-wrapper': ['lib/libOPTIM.so']},
     'version': versioneer.get_version(),
     'cmdclass': versioneer.get_cmdclass(),

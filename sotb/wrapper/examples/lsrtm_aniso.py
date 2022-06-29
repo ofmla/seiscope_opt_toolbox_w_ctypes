@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
 
-from sotb_wrapper import interface
+from sotb.wrapper import interface
 
 '''
 In this script we show a simple numerical examples for LSRTM

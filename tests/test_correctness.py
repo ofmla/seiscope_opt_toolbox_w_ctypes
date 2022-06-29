@@ -4,7 +4,7 @@ import sys
 import filecmp
 import numpy as np
 import ctypes
-from sotb_wrapper import interface
+from sotb.wrapper import interface
 from ctypes import c_int, c_float, c_bool, POINTER
 
 
