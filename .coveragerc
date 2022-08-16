@@ -1,0 +1,2 @@
+[report]
+omit=sotb_wrapper/_version.py
