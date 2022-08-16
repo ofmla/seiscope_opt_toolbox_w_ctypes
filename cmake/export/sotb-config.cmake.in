@@ -1,0 +1,16 @@
+@PACKAGE_INIT@
+
+# Global config options
+# Set any variable here, you want to communicate to packages using yours
+#set(sotb_WITH_OMP @WITH_OMP@)
+
+include(CMakeFindDependencyMacro)
+
+# Just in case the project provides / installs own FindPackage modules
+if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/Modules)
+    list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/Modules)
+endif()
+
+if(NOT TARGET sotb::sotb)
+    include("${CMAKE_CURRENT_LIST_DIR}/sotb-targets.cmake")
+endif()
