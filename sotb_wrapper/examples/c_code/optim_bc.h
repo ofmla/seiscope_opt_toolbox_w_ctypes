@@ -25,11 +25,18 @@ typedef struct {
     float qk_CG, qkm1_CG, hessian_term, eta, norm_grad, norm_grad_m1, norm_residual;
     float dHd, res_scal_respreco, alpha_CG;
 } optim_type;
-
-void LBFGS(int, float *, float*, float *, optim_type *, int*, void*, void*);
-void rosenbrock(float *, float *, float *);
-
 #endif
+
+void rosenbrock(float *, float *, float *);
+void rosenbrock_hess(float *, float *, float *);
+void set_inputs(optim_type*, float, int, float*, int*, float*, int*, int*, int*, bool*);
+void PSTD(int, float*, float*, float*, optim_type*, int*, void*, void*);
+void PNLCG(int, float*, float*, float*, optim_type*, int*, void*, void*);
+void LBFGS(int, float*, float*, float*, optim_type*, int*, void*, void*);
+void PLBFGS(int, float*, float*, float*, float*, float*, optim_type *, int*, void*, void*);
+void TRN(int, float*, float*, float*, float*, float*, optim_type*, int*, void*, void*);
+void PTRN(int, float*, float*, float*, float*, float*, float*, float*, float*, optim_type*, int*, void*, void*);
+
 #ifdef __cplusplus
 }
 #endif
