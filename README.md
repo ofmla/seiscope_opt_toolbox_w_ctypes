@@ -17,30 +17,32 @@ and Romain Brossier. Minor changes to the original code have been made to allow 
 
 The SEISCOPE toolbox uses a derived data type (`optim`); functionality that is not yet supported at this time by f2py - and for this reason it is used [ctypes](https://docs.python.org/3/library/ctypes.html). The `optim` data type is maintained, but without allocatable arrays.
 
-The repo contains a `src` directory with the modified fortran source files and a subdirectory `tests` where each method is used to find the minimum of the banana Rosenbrock function. The python wrapper for the SEISCOPE optimization toolbox is found inside the `sotb_wrapper` directory. A `tests` directory (different from than one within `src`) includes a script to check that the wrapper has suceeded in reproducing bit-for-bit the results of the original fortran code.
+The repo contains a `src` directory with the modified fortran source files and another named `apps` where each method is used to find the minimum of the banana Rosenbrock function. The python wrapper for the SEISCOPE optimization toolbox is found inside the `sotb_wrapper` directory. A `tests` directory includes a script to check that the wrapper has suceeded in reproducing bit-for-bit the results of the original fortran code.
 
-Compiling
+Install Seiscope optimization toolbox (sotb)
 -----
 
-To build the dynamic library from the source files, use the [FoBiS](https://github.com/szaghi/FoBiS) configuration file `seiscope_opt_toolbox_w_ctypes.fobis`. 
-To do this, type the following 
+If you only want to use the Fortran library, you can simply clone the repo and build it with [Fortran Package Manager](https://github.com/fortran-lang/fpm) or [CMake](https://cmake.org/). In the first case you you just need to run 
+```bash
+fpm build --profile release
 ```
-FoBiS.py build -f seiscope_opt_toolbox_w_ctypes.fobis -mode shared-gnu
-```
-It is also possible to build the library in static form and the `tests` programs by changing the `mode` flag. The full set of modes are: `static-gnu`, `static-gnu-debug`, `static-intel`, `static-intel-debug`, `shared-gnu`, `shared-gnu-debug`, `shared-intel`, `shared-intel-debug`, `tests-gnu`, `tests-gnu-debug`, `tests-intel`, `tests-intel-debug`. The modes should be self-explanatory: shared, static and tests are the modes for building (in realese, optimized form) the shared and static versions of the library and the test programs, respectively. The other 3 modes are the same, but in debug form instead of release one. -gnu use the GNU gfortran compiler while -intel the Intel one.
+This command creates the library in static form, as originally designed as well as executable files from demo codes. 
 
-A simple bash script `build.sh` is also provided for building the seiscope optimization toolbox with gfortran using [FoBiS](https://github.com/szaghi/FoBiS). It creates the library in static form, as originally designed as well as the tests programs. This option can be used if the user is only interested in the fortran librray.
+To use `sotb` within your fpm project, add the following to your `fpm.toml` file:
 
-Install sotb-wrapper
------
+```yml
+[dependencies]
+sotb = { git="https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes.git" }
+```
+In the second case, you can run a workflow as the following:
+```bash
+FC=gfortran cmake -B _build -DCMAKE_INSTALL_PREFIX=$PREFIX -DCMAKE_BUILD_TYPE=Release
+cmake --build _build
+cmake --install _build
+```
+where you need to replace `$PREFIX` with the desired directory.
 
-After cloning the repo and build the dynamic library as indicated above in compiling step, you can install `sotb-wrapper` for development with `--editable`. What should follow is
-```
-git clone https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes.git
-cd seiscope_opt_toolbox_w_ctypes
-FoBiS.py build -f seiscope_opt_toolbox_w_ctypes.fobis -mode shared-gnu
-pip install -e .
-```
+Examples of use of `sotb` can be found in the `app` folder, which contains a folder with an example for each one of the optimization algorithms available in the library. The executable files for each example are built with `cmake` invocation above and made available at `$PREFIX/bin` folder. As mentioned before, when you use `fpm`, executable files for the examples are also created. In this latest case, you can use `fpm run --profile release <test_name>` to run an specific example. So, if you want to run the example that uses the limited-memory version of BFGS algorithm, simply run `fpm run --profile release test_LBFGS`. If you run `fpm run --profile release` you can see the names of the six available examples.
 
 Usage
 -----
