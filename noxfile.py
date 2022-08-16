@@ -13,8 +13,8 @@ pyversions = ["3.8", "3.9", "3.10"]
 @nox.session(python=pyversions)
 def tests(session: Session) -> None:
     """Run tests."""
-    args = session.posargs + ["--cov=sotb_wrapper", "-s"]
-    session.install("pytest", "pytest-cov")
+    args = session.posargs + ["--cov=sotb_wrapper", "-s", "--cov-config=.coveragerc"]
+    session.install("pytest", "pytest-cov", "coverage")
     session.install(".")
     session.run("pytest", *args)
 
