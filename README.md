@@ -22,7 +22,7 @@ The repo contains a `src` directory with the modified fortran source files and a
 Install Seiscope optimization toolbox (sotb)
 -----
 
-If you only want to use the Fortran library, you can simply clone the repo and build it with [Fortran Package Manager](https://github.com/fortran-lang/fpm) or [CMake](https://cmake.org/). In the first case you you just need to run 
+If you only want to use the Fortran library, you can simply clone the repo and build it with [Fortran Package Manager](https://github.com/fortran-lang/fpm) or [CMake](https://cmake.org/). In the first case you just need to run 
 ```bash
 fpm build --profile release
 ```
@@ -42,7 +42,16 @@ cmake --install _build
 ```
 where you need to replace `$PREFIX` with the desired directory.
 
-Examples of use of `sotb` can be found in the `app` folder, which contains a folder with an example for each one of the optimization algorithms available in the library. The executable files for each example are built with `cmake` invocation above and made available at `$PREFIX/bin` folder. As mentioned before, when you use `fpm`, executable files for the examples are also created. In this latest case, you can use `fpm run --profile release <test_name>` to run an specific example. So, if you want to run the example that uses the limited-memory version of BFGS algorithm, simply run `fpm run --profile release test_LBFGS`. If you run `fpm run --profile release` you can see the names of the six available examples.
+Examples of use of `sotb` can be found in the `app` folder, which contains a folder with an example for each one of the optimization algorithms available in the library. The executable files for each example are built with `cmake` invocation above and made available at `$PREFIX/bin` folder. As mentioned before, when you use `fpm`, executable files for the examples are also created. In this latest case, you can use `fpm run --profile release <test_name>` to run an specific example. So, if you want to run the example that uses the limited-memory version of Broyden-Fletcher-Goldfarb-Shanno (L-BFGS) algorithm, simply run `fpm run --profile release test_LBFGS`. If you run `fpm run --profile release` you can see the names of the six available examples. You can also find a simple example on calling the Fortran subroutines from a C main program in the [`c_code`](https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes/tree/main/sotb_wrapper/examples/c_code) directory. The example uses the L-BFGS to minimize the Rosenbrock's "banana function". You can create the executable from [`c_code`](https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes/tree/main/sotb_wrapper/examples/c_code) by running 
+```bash
+cmake -S. -B _build -DCMAKE_PREFIX_PATH="`pwd`/../../../"
+cmake --build _build
+```
+or
+```bash
+cmake -S. -B _build -Dsotb_DIR="`pwd`/../../../lib/cmake/sotb"
+cmake --build _build
+```
 
 Usage
 -----
@@ -51,7 +60,7 @@ Example run scripts are included in the [`sotb_wrapper/examples`](https://github
 
 <img src="./sotb_wrapper/examples/computationalcost_curves.svg" width="425"/> <img src="./sotb_wrapper/examples/convergence_curves.svg" width="425"/> 
 
-A tutorial in the form of a Jupyter notebook (`rosenbrock.ipynb`) is also supplied. The goal of the tutorial is show you how one can use sotb-wrapper to find a minimum for a problem, which can optionally be subject to bound constraints (also called box constraints). You can also find a simple example on calling the Fortran subroutines from a C main program in the [`c_code`](https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes/tree/main/sotb_wrapper/examples/c_code) directory. The example uses the Limited-memory Broyden-Fletcher-Goldfarb-Shanno (L-BFGS) algorithm to minimize the Rosenbrock's "banana function".
+A tutorial in the form of a Jupyter notebook (`rosenbrock.ipynb`) is also supplied. The goal of the tutorial is show you how one can use sotb-wrapper to find a minimum for a problem, which can optionally be subject to bound constraints (also called box constraints). 
 
 License
 -----
