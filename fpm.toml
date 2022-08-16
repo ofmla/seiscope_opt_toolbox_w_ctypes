@@ -7,8 +7,8 @@ homepage = "https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes"
 keywords = ["optimization", "gradient-based algorithms"]
 
 [build]
-auto-executables = false
-auto-examples = true
+auto-executables = true
+auto-examples = false
 auto-tests = false
 
 [library]
