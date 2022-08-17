@@ -1,7 +1,7 @@
-name: Test Fortran
+name: Fortran test
 on:
   push:
-    branches: [ main, cmake_built ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 

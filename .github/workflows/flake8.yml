@@ -2,7 +2,7 @@ name: Flake8
 
 on:
   push:
-    branches: [ main, cmake_built ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
