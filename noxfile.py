@@ -4,7 +4,7 @@ import nox
 from nox.sessions import Session
 
 nox.options.sessions = "lint", "tests", "mypy"  # default session
-locations = "sotb_wrapper", "tests", "noxfile.py"  # Linting locations
+locations = "sotb_wrapper", "test", "noxfile.py"  # Linting locations
 locations_mypy = "sotb_wrapper/interface.py"  # mypy locations
 pyversions = ["3.8", "3.9", "3.10"]
 
@@ -13,8 +13,10 @@ pyversions = ["3.8", "3.9", "3.10"]
 @nox.session(python=pyversions)
 def tests(session: Session) -> None:
     """Run tests."""
-    args = session.posargs + ["--cov=sotb_wrapper", "-s", "--cov-config=.coveragerc"]
-    session.install("pytest", "pytest-cov", "coverage")
+    pkg_path = f'{session.virtualenv.location}/lib/python{session.python}/site-packages'
+    strg = ["--cov", f"{pkg_path}/sotb_wrapper", "-s", "--import-mode=importlib"]
+    args = session.posargs + strg
+    session.install("pytest", "pytest-cov")
     session.install(".")
     session.run("pytest", *args)
 

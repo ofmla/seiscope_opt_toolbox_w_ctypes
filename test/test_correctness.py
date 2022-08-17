@@ -4,13 +4,14 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import sysconfig
 
 import numpy as np
 
 from sotb_wrapper import interface
 
-root_dir = Path(__file__).parent.parent
-exe_dir = root_dir / "sotb_wrapper"
+pkg_folder = sysconfig.get_path("purelib")
+exe_dir = f"{pkg_folder}/sotb_wrapper"
 exe_filenames = ["./" + file for file in os.listdir(exe_dir) if file.startswith("test")]
 
 
@@ -160,11 +161,11 @@ def test_byte_by_byte_comp():
 
     Test to verify if both set of log files (those obtained by run the Fortran
     tests and by run the script with the wrapper to the library) have the same
-    content. A simple byte-by-byte comparison is done with the filecmp library
+    content. A simple comparison is done with the filecmp library
     http://docs.python.org/library/filecmp.html
     """
     files1 = [file for file in os.listdir(exe_dir) if file.endswith(".dat")]
-    files2 = [file for file in os.listdir(root_dir) if file.endswith(".dat")]
+    files2 = [file for file in os.listdir("./") if file.endswith(".dat")]
     # just make sure there are some outputs
     assert len(files1) > 0
     assert len(files2) > 0
@@ -174,7 +175,7 @@ def test_byte_by_byte_comp():
         cmpfiles.append(
             filecmp.cmp(
                 os.path.join(exe_dir, file),
-                os.path.join(root_dir, file),
+                os.path.join("./", file),
                 shallow=False,
             )
         )
