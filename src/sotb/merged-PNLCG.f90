@@ -140,73 +140,7 @@ subroutine finalize_PNLCG
   deallocate(descent_prev)
   
 end subroutine finalize_PNLCG
-!*****************************************************!
-!*          SEISCOPE OPTIMIZATION TOOLBOX            *!
-!*****************************************************!
-! This routine is used for the initialization of the  !
-! reverse communication mode preconditioned nonlinear !
-! conjugate gradient algorithm from the TOOLBOX.      !
-!                                                     !
-! The parameters for the linesearch are set here, as  !
-! well as the data structure allocations required for !
-! the use of the algorithm                            !
-!-----------------------------------------------------!
-! INPUT : integer n, dimension of the problem         !
-!       : real fcost                                  !
-!       : real,dimension(n) x,grad,grad_preco         !
-!                           first iterate, gradient   !
-!                           preconditioned gradient   !
-! INPUT/OUTPUT : optim_type optim data structure      ! 
-!-----------------------------------------------------!
-subroutine init_PNLCG(n,x,fcost,grad_preco,optim)
-  
-  implicit none
 
-  !IN
-  integer :: n
-  real :: fcost
-  real,dimension(n) :: x,grad_preco
-  !IN/OUT
-  type(optim_type) :: optim !data structure   
-
-  !---------------------------------------!
-  ! set counters                          !
-  !---------------------------------------!
-  optim%cpt_iter=0
-  optim%f0=fcost
-  optim%nfwd_pb=0
-
-  !---------------------------------------!
-  ! initialize linesearch parameters      !
-  ! by default, the max number of         !
-  ! linesearch iteration is set to 20     !
-  ! and the initial steplength is set to 1!
-  !---------------------------------------! 
-  optim%m1=1e-4 ! Wolfe conditions parameter 1 (Nocedal value)
-  optim%m2=0.9  ! Wolfe conditions parameter 2 (Nocedal value)
-  optim%mult_factor=10 ! Bracketting parameter (Gilbert value)
-  optim%fk=fcost
-  optim%nls_max=30 ! max number of linesearch
-  optim%cpt_ls=0
-  optim%first_ls=.true.
-  optim%alpha=1. ! first value for the linesearch steplength 
-  
-  !---------------------------------------!
-  ! memory allocations                    !
-  !---------------------------------------!
-  allocate(grad_prev(n))
-  allocate(descent_prev(n))
-  allocate(xk(n))
-  xk(:)=x(:)
-  allocate(descent(n))
-  
-  !---------------------------------------!
-  ! first descent direction               !
-  !---------------------------------------!
-  descent(:)=-1.*grad_preco(:)
-  
-
-end subroutine init_PNLCG
 !*****************************************************!
 !*          SEISCOPE OPTIMIZATION TOOLBOX            *!
 !*****************************************************!
@@ -288,7 +222,9 @@ subroutine PNLCG(n,x,fcost,grad,grad_preco,optim,flag,lb,ub)
      ! subroutine to allocate data structure optim and     !
      ! initialize the linesearch process                   !
      !-----------------------------------------------------!
-     call init_PNLCG(n,x,fcost,grad_preco,optim)
+     allocate(grad_prev(n), descent_prev(n), xk(n), descent(n))
+     xk(:)=x(:)
+     descent(:)=-1.*grad_preco(:)  ! first descent direction 
      call std_linesearch(n,x,fcost,grad,xk,descent,optim,lb,ub) !lb,ub,optim
      call print_info(n,'CG',optim,fcost,grad,FLAG)
      FLAG=1     

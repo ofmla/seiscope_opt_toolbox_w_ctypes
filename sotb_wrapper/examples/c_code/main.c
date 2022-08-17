@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "optim_bc.h"
 
 int main() {
@@ -22,13 +23,14 @@ int main() {
 	
 	// Create structure
 	optim_type optim;
-	optim.niter_max = 10000; // maximum iteration number
-	optim.conv = 1e-8;       // tolerance for the stopping criterion
-	optim.print_flag = 1;    // print info in output files
-	optim.debug = false;     // level of details for output files
-	optim.l = 20;            // maximum number of stored pairs used for
-                             // the l-BFGS approximation
-	
+	float conv = 1e-8;     // tolerance for the stopping criterion
+	int print_flag = 1;    // print info in output files
+	bool debug = false;    // level of details for output files
+	int niter_max = 10000; // maximum iteration number
+	int nls_max = 20;      // max number of linesearch iteration
+	int l = 20;            // maximum number of stored pairs used for
+                           // the l-BFGS approximation
+
 	// initial guess
 	x[0] = 1.5;
 	x[1] = 1.5;
@@ -37,6 +39,9 @@ int main() {
 	 * with the initial guess
 	 */
 	rosenbrock(x,&fcost,grad);
+
+    // parameter initialization
+	set_inputs(&optim, fcost, niter_max, NULL, &nls_max, &conv, &print_flag, &l, NULL, &debug);
 	
     /* optimization loop: while convergence not reached or 
      * linesearch not failed, iterate

@@ -29,22 +29,16 @@
 !IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 !POSSIBILITY OF SUCH DAMAGE.
 
-
 !*****************************************************!
 !*          SEISCOPE OPTIMIZATION TOOLBOX            *!
 !*****************************************************!
 ! This program provides an example for using the      !
-! preconditioned nonlinear conjugate gradient         !
-! algorithm within the TOOLBOX .                      !
+! l-BFGS algorithm within the TOOLBOX.                !
 !                                                     !
-! The version implemented is the one by               !
-! Y. DAI AND Y. YUAN, A nonlinear conjugate gradient  !
-! method with a strong global convergence property,   !
-! SIAM Journal on Optimization, 10 (1999), pp. 177–182!
-!                                                     !
-! See also Nocedal, Numerical optimization,           !
-! 2nd edition p.132                                   !
-!                                                     !
+! The version implemented is described in             !
+! Numerical Optimization, Nocedal, 2nd edition, 2006  !
+! Algorithm 7.4 p. 178, Algorithm 7.5 p. 179          !
+
 ! The 2D Rosenbrock function is minimized             !
 ! f(x,y)  = (1-x)**2+100.*(y-x**2)**2                 !
 !                                                     !
@@ -52,7 +46,7 @@
 ! is implemented in                                   !
 ! ../../../COMMON/test/rosenbrock.f90                 !
 !                                                     !
-! The communication with the PNLCG optimizer is       ! 
+! The communication with the LBFGS optimizer is       ! 
 ! achieved through the variable FLAG.                 !
 !                                                     !
 ! Here are the actions requested for the user         !
@@ -63,7 +57,7 @@
 !      (this stopping criterion is the default one    !
 !        in the TOOLBOX and is based on the decrease  !
 !        of the misfit function scaled to one at the  !
-!       first iteration                               !
+!        first iteration                              !
 !     - level of details in the output                !
 !       * if optim%debug=.true. then the information  !
 !         on the linesearch process is provided       !
@@ -74,28 +68,16 @@
 !     associated with the initial guess               !
 !   - initialize grad with the gradient associated    !
 !     with the initial guess                          !
-!   - initialize grad_preco with the preconditioned   !
-!     version of the gradient.                        !
-!    %%%%%%%%%%%                                      !
-!    %IMPORTANT%                                      !
-!    %%%%%%%%%%%                                      !  
-!    If the user wants to use the PNLCG algorithm     !
-!    WITHOUT preconditioning he has to COPY grad      !
-!    in grad_preco                                    !
+!   - initialize optim%l with the maximum number of   !
+!     pairs the user may want to use (3-40)           !
 ! 2. On first call, FLAG must be set to INIT          !
-! 3. When the FLAG returned by PNLCG is 'GRAD', then  !
-!    the user must compute the cost, the gradient and !
-!    the preconditioned gradient at current iterate x !
-!    %%%%%%%%%%%                                      !
-!    %IMPORTANT%                                      !
-!    %%%%%%%%%%%                                      !
-!    If the user wants to use the PNLCG algorithm     !
-!    WITHOUT preconditioning he has to COPY grad in   !
-!    grad_preco                                       !
+! 3. When the FLAG returned by LBFGS is 'GRAD', then  !
+!    the user must compute the cost and the gradient  !
+!    at current iterate x                             ! 
 !-----------------------------------------------------!
-program test_PNLCG
+program test_LBFGS
   !use typedef
-  !use opt_PNLCG
+  !use opt_LBFGS
   use seiscope_optimization_toolbox
   implicit none  
   
@@ -103,63 +85,52 @@ program test_PNLCG
   real :: fcost                               ! cost function value
   real,dimension(:),allocatable :: x          ! current point
   real,dimension(:),allocatable :: grad       ! current gradient
-  real,dimension(:),allocatable :: grad_preco ! preconditioned current gradient
   type(optim_type) :: optim                   ! data structure for the optimizer
-  !character*4 :: FLAG                         ! communication 
-  integer :: FLAG                             ! communication 
+  !character*4 :: FLAG                        ! communication FLAG 
+  integer :: FLAG                             ! communication FLAG
+   
+  !----------------------------------------------------!
+  ! Set size of one-dimensional solution array and     !
+  ! first flag value                                   !
+  !----------------------------------------------------!
+  n=2     ! dimension
+  FLAG=0  ! first flag -- 'INIT' in original version
   
-  !----------------------------------------------------!
-  ! parameter initialization                           !
-  !----------------------------------------------------!
-  n=2                     ! dimension
-  !FLAG='INIT'             ! first flag
-  FLAG=0            ! first flag
-  optim%niter_max=10000   ! maximum iteration number 
-  optim%conv=1e-8         ! tolerance for the stopping criterion
-  optim%print_flag=1      ! print info in output files 
-  optim%debug=.false.     ! level of details for output files
-
   !----------------------------------------------------!
   ! intial guess                                       !
   !----------------------------------------------------!
-  allocate(x(n),grad(n),grad_preco(n))
+  allocate(x(n),grad(n))
   x(1)=1.5
   x(2)=1.5
-  
+
   !----------------------------------------------------!
   ! computation of the cost and gradient associated    !
   ! with the initial guess                             !
   !----------------------------------------------------!
   call Rosenbrock(x,fcost,grad)
-
+  
   !----------------------------------------------------!
-  ! copy of grad in grad_preco: no preconditioning in  !
-  ! this test                                          !
+  ! parameter initialization                           !
   !----------------------------------------------------!
-  grad_preco(:)=grad(:) ! 
+  call set_inputs(optim, fcost, 10000, 1., 20, 1e-8, l=20)
   
   !----------------------------------------------------!
   ! optimization loop: while convergence not reached or!
   ! linesearch not failed, iterate                     !
   !----------------------------------------------------!
-  !call PNLCG(n,x,fcost,grad,grad_preco,optim,FLAG)
   !do while ((FLAG.ne.'CONV').and.(FLAG.ne.'FAIL'))
-  do while ((FLAG.ne.2).and.(FLAG.ne.4))
-     call PNLCG(n,x,fcost,grad,grad_preco,optim,FLAG)
-     !if(FLAG.eq.'GRAD') then 
-     !print*,FLAG    
-     if(FLAG.eq.1) then        
+  do while ((FLAG /= 2) .and. (FLAG /= 4)) 
+     call LBFGS(n,x,fcost,grad,optim,FLAG)
+     !if(FLAG.eq.'GRAD') then  
+     if(FLAG == 1) then          
         !compute cost and gradient at point x
-        call Rosenbrock(x,fcost,grad)
-        ! no preconditioning in this test: simply copy grad in 
-        ! grad_preco
-        grad_preco(:)=grad(:) 
+        call Rosenbrock(x,fcost,grad)        
      endif
   enddo
   
   !Helpful console writings
   write(*,*) 'END OF TEST'
   write(*,*) 'FINAL iterate is : ', x(:)
-  write(*,*) 'See the convergence history in iterate_CG.dat'
+  write(*,*) 'See the convergence history in iterate_LB.dat'
   
-end program test_PNLCG
+end program test_LBFGS

@@ -64,6 +64,104 @@ subroutine rosenbrock_hess(x,d,Hd) bind(c, name='rosenbrock_hess')
   
 end subroutine rosenbrock_hess
 
+subroutine set_inputs(optim, fcost, niter_max, &
+                      alpha, nls_max, conv, print_flag, &
+                      l, niter_max_CG, debug) bind(c, name='set_inputs')
+ 
+  use, intrinsic :: iso_c_binding
+  use, intrinsic :: iso_fortran_env, only : real32
+  implicit none
+  type(optim_type) :: optim !data structure
+  real(c_float),intent(in),value            :: fcost 
+  real(c_float),intent(in),optional         :: alpha
+  real(c_float),intent(in),optional         :: conv
+  integer(c_int),intent(in),value           :: niter_max
+  integer(c_int),intent(in),optional        :: nls_max
+  integer(c_int),intent(in),optional        :: print_flag
+  integer(c_int),intent(in),optional        :: l
+  integer(c_int),intent(in),optional        :: niter_max_CG
+  integer(c_int),intent(in),optional        :: debug
+  
+  ! tolerance for the stopping criterion
+  if (present(conv)) then
+   optim%conv=conv
+  else ! default:
+   optim%conv=epsilon(1._real32)
+  endif
+  
+  ! print info in output files
+  if (present(print_flag)) then
+   optim%print_flag=print_flag
+  else ! default:
+   optim%print_flag=1
+  endif
+  
+  ! level of details for output files
+  if (present(debug)) then
+   optim%debug=debug
+  else ! default:
+   optim%debug=0
+  endif
+  
+  ! maximum iteration number 
+  optim%niter_max=niter_max
+  
+  !---------------------------------------!
+  ! set counters                          !
+  !---------------------------------------!
+  ! common to all
+  optim%cpt_iter=0
+  optim%f0=fcost
+  optim%nfwd_pb=0  
+  ! related to lbfgs/plbfgs
+  optim%cpt_lbfgs=1
+  ! related to trn/ptrn
+  optim%nhess=0
+  optim%eta=0.9  
+  optim%cpt_iter_CG=0
+  
+  ! maximum number of stored pairs used for
+  ! the l-BFGS approximation
+  if (present(l)) then
+   optim%l=l
+  else ! default:
+   optim%l=10
+  endif  
+  
+  ! maximum number of inner conjugate gradient 
+  ! iterations
+  if (present(niter_max_CG)) then
+   optim%niter_max_CG=niter_max_CG
+  else ! default:
+   optim%niter_max_CG=10
+  endif     
+
+  optim%m1=1e-4 ! Wolfe conditions parameter 1 (Nocedal value)
+  optim%m2=0.9  ! Wolfe conditions parameter 2 (Nocedal value)
+  optim%mult_factor=10 ! Bracketting parameter (Gilbert value)
+  optim%fk=fcost
+  optim%cpt_ls=0
+  optim%first_ls=1
+
+  !---------------------------------------!
+  ! initialize linesearch parameters      !
+  ! by default, the max number of         !
+  ! linesearch iteration is set to 20     !
+  ! and the initial steplength is set to 1!
+  !---------------------------------------! 
+  if (present(alpha)) then
+   optim%alpha=alpha
+  else ! default:
+   optim%alpha=1.
+  endif
+  
+  if (present(nls_max)) then
+   optim%nls_max=nls_max
+  else ! default:
+   optim%nls_max=20
+  endif
+
+end subroutine set_inputs
 
 !*******************************************************!
 !*    SEISCOPE OPTIMIZATION TOOLBOX                    *!
@@ -269,7 +367,7 @@ subroutine std_linesearch(n,x,fcost,grad,xk,descent,optim,lb,ub) !lb,ub,optim
   !Local variables
   real :: q0,new_alpha
     
-  if(optim%first_ls) then
+  if(optim%first_ls == 1) then
      !---------------------------------------!
      ! FIRST LINESEARCH: initialization step !
      !---------------------------------------!
@@ -280,7 +378,7 @@ subroutine std_linesearch(n,x,fcost,grad,xk,descent,optim,lb,ub) !lb,ub,optim
      optim%alpha_L=0.
      optim%alpha_R=0.
      optim%task=1
-     optim%first_ls=.false.
+     optim%first_ls=0
      xk(:)=x(:)
      x(:)=xk(:)+optim%alpha*descent(:)
      !IF BOUNDS ACTIVATED, PROJECT x(:) TO THE FEASIBLE ENSEMBLE
@@ -294,7 +392,7 @@ subroutine std_linesearch(n,x,fcost,grad,xk,descent,optim,lb,ub) !lb,ub,optim
      ! but a decrease of the misfit is produced then accept the steplength   !
      !-----------------------------------------------------------------------!
      optim%task=0        
-     optim%first_ls=.true.
+     optim%first_ls=1
      !Compute new x in the descent direction     
      x(:)=xk(:)+optim%alpha*descent(:)     
      !IF BOUNDS ACTIVATED, PROJECT x(:) INTO TO THE FEASIBLE ENSEMBLE
@@ -321,8 +419,8 @@ subroutine std_linesearch(n,x,fcost,grad,xk,descent,optim,lb,ub) !lb,ub,optim
         ! ends here with success                                             !
         !--------------------------------------------------------------------!
         optim%task=0
-        optim%first_ls=.true.
-        if(optim%debug) then
+        optim%first_ls=1
+        if(optim%debug == 1) then
            if(optim%print_flag.eq.1) then
               write(10,*) 'fcost :',fcost
               write(10,*) 'optim%f0 :',optim%f0
@@ -339,7 +437,7 @@ subroutine std_linesearch(n,x,fcost,grad,xk,descent,optim,lb,ub) !lb,ub,optim
         ! If the first condition is not satisfied then shrink the            !
         ! search interval                                                    !
         !--------------------------------------------------------------------!
-        if(optim%debug) then
+        if(optim%debug == 1) then
            if(optim%print_flag.eq.1) then
               write(10,*) 'failure 1'
               write(10,*) 'fcost :',fcost
@@ -362,7 +460,7 @@ subroutine std_linesearch(n,x,fcost,grad,xk,descent,optim,lb,ub) !lb,ub,optim
         ! search interval unless the right bound of the search interval      !
         ! as not yet been defined                                            !
         !--------------------------------------------------------------------!
-        if(optim%debug) then
+        if(optim%debug == 1) then
            if(optim%print_flag.eq.1) then
               write(10,*) 'failure 2'
               write(10,*) 'fcost :',fcost

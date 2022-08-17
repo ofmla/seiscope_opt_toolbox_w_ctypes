@@ -30,29 +30,34 @@
 !POSSIBILITY OF SUCH DAMAGE.
 
 module typedef
-use, intrinsic :: iso_c_binding, only: c_float, c_bool, c_int
+use, intrinsic :: iso_c_binding, only: c_float, c_int
 implicit none
 
 type, bind(c) :: optim_type
                                                                       
 !sequence
 
+!There were changes made to the original derived type in order
+!to enable C interoperability and to take things a bit easier.
+
+!-> allocatable arrays were eliminated
+!-> logical variables `debug`, `first_ls` and `conv_CG` were changed by integers 
+!   zero is interpreted as .FALSE. and one is interpreted as .TRUE.
+!-> variables of type character `task`, `CG_phase` and `comm` have been replaced by integers
+!-> integer variable `bound` is no longer being used
+
 !#### DEBUG OPTION FOR USER
 !# when debug is false: no information printed
 !# when debug is true: additional information printed
-logical(c_bool) :: debug
+integer(c_int) :: debug
 
-!#### BOUND CONSTRAINTS OPTION FOR USER
-!# when bound is 0: no bound constraints
-!# when bound is 1: bound constraints activated
-!integer :: bound
 real(c_float) :: threshold !#tolerance on bound constraints satisfaction
 
 !#### PRINTING FLAG FOR MPI APPLICATION
 integer(c_int) :: print_flag
 
 !#### LINESEARCH PARAMETERS
-logical(c_bool)  :: first_ls
+integer(c_int)  :: first_ls
 integer(c_int)   :: task !(0 -NEW_STEP, 1 -NEW_GRAD, 2 -FAILURE!)
 integer(c_int)   :: nls_max,cpt_ls,nfwd_pb,cpt_iter,niter_max
 real(c_float)    :: f0,fk,conv
@@ -63,7 +68,7 @@ real(c_float)    :: q0, q
 integer(c_int) :: cpt_lbfgs,l
 
 !### TRUNCATED NEWTON PARAMETERS
-logical(c_bool)  :: conv_CG
+integer(c_int)  :: conv_CG
 integer(c_int)   :: cpt_iter_CG,niter_max_CG,nhess
 integer(c_int)   :: CG_phase !(0 -INIT, 1 -IRUN)
 integer(c_int)   :: comm !(1 -DES1, 2 -DES2, 3 -NSTE)

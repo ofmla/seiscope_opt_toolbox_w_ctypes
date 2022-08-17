@@ -1,0 +1,46 @@
+name: Fortran test
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        gcc_v: [10] # Version of GFortran we want to use.
+    env:
+      FC: gfortran-${{ matrix.gcc_v }}
+      GCC_V: ${{ matrix.gcc_v }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup Fortran Package Manager
+      uses: fortran-lang/setup-fpm@v4
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Install GFortran Linux
+      if: contains( matrix.os, 'ubuntu')
+      run: |
+        sudo update-alternatives \
+           --install /usr/bin/gcc gcc /usr/bin/gcc-${{ matrix.gcc_v }} 100 \
+           --slave /usr/bin/gfortran gfortran /usr/bin/gfortran-${{ matrix.gcc_v }}
+
+    - name: Run apps with fpm
+      if: contains( matrix.os, 'ubuntu')
+      run: |
+        fpm run --profile release test_PSTD
+        fpm run --profile release test_PNLCG
+        fpm run --profile release test_PLBFGS
+        fpm run --profile release test_LBFGS
+        fpm run --profile release test_PTRN
+        fpm run --profile release test_TRN

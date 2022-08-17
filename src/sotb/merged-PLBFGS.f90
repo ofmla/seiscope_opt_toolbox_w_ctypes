@@ -170,77 +170,7 @@ subroutine finalize_PLBFGS()
   deallocate(yk)  
   
 end subroutine finalize_PLBFGS
-!*****************************************************!
-!*          SEISCOPE OPTIMIZATION TOOLBOX            *!
-!*****************************************************!
-! This routine is used for the initialization of the  !
-! reverse communication mode preconditioned l-BFGS    !
-! algorithm from the TOOLBOX.                         !
-!                                                     !
-! The parameters for the linesearch are set here, as  !
-! well as the data structure allocations required for !
-! the use of the algorithm                            !
-!-----------------------------------------------------!
-! INPUT : integer n, dimension of the problem         !
-!       : real fcost                                  !
-!       : real,dimension(n) x,grad,grad_preco         !
-!                           initial guess, gradient   !
-!                           preconditioned gradient   !
-!                           at first iteration        !
-! INPUT/OUTPUT : optim_type optim data structure      ! 
-!-----------------------------------------------------!
-subroutine init_PLBFGS(n,l,x,fcost,grad,grad_preco,optim)
-  
-  implicit none
 
-  !IN
-  integer :: n,l 
-  real :: fcost
-  real,dimension(n) :: x,grad,grad_preco
-  !IN/OUT
-  type(optim_type) :: optim !data structure   
-  
-  !---------------------------------------!
-  ! set counters                          !
-  !---------------------------------------!
-  optim%cpt_iter=0
-  optim%f0=fcost
-  optim%nfwd_pb=0  
-  optim%cpt_lbfgs=1
-  
-  !---------------------------------------!
-  ! initialize linesearch parameters      !
-  ! by default, the max number of         !
-  ! linesearch iteration is set to 20     !
-  ! and the initial steplength is set to 1!
-  !---------------------------------------! 
-  optim%m1=1e-4 ! Wolfe conditions parameter 1 (Nocedal value)
-  optim%m2=0.9  ! Wolfe conditions parameter 2 (Nocedal value)
-  optim%mult_factor=10 ! Bracketting parameter (Gilbert value)
-  optim%fk=fcost
-  optim%nls_max=20 ! max number of linesearch
-  optim%cpt_ls=0
-  optim%first_ls=.true.
-  optim%alpha=1. ! first value for the linesearch steplength 
-  
-  !---------------------------------------!
-  ! memory allocations                    !
-  !---------------------------------------!
-  allocate(xk(n))
-  xk(:)=x(:)   
-  allocate(descent(n))
-  allocate(sk(n,l),yk(n,l))
-  sk(:,:)=0.
-  yk(:,:)=0.
-  
-  !---------------------------------------!
-  ! first descent direction               !
-  !---------------------------------------!
-  descent(:)=-1.*grad_preco(:)  
-  
-  call save_LBFGS(n,optim%cpt_lbfgs,l,x,grad,sk,yk)
-  
-end subroutine init_PLBFGS
 !*****************************************************!
 !*          SEISCOPE OPTIMIZATION TOOLBOX            *!
 !*****************************************************!
@@ -326,7 +256,13 @@ subroutine PLBFGS(n,x,fcost,grad,grad_preco,q_plb,optim,flag,lb,ub)
      ! subroutine to allocate data structure optim and     !
      ! initialize the linesearch process                   !
      !-----------------------------------------------------!
-     call init_PLBFGS(n,optim%l,x,fcost,grad,grad_preco,optim)
+     !call init_PLBFGS(n,optim%l,x,fcost,grad,grad_preco,optim)
+     allocate(sk(n,optim%l), yk(n,optim%l), xk(n), descent(n))
+     sk(:,:)=0.
+     yk(:,:)=0.
+     xk(:)=x(:)
+     descent(:)=-1.*grad_preco(:)
+     call save_LBFGS(n,optim%cpt_lbfgs,optim%l,x,grad,sk,yk)
      call std_linesearch(n,x,fcost,grad,xk,descent,optim,lb,ub)
      call print_info(n,'PL',optim,fcost,grad,FLAG)
      FLAG=1     

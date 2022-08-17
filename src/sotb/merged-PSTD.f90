@@ -35,7 +35,7 @@ use miscellaneous
 
 private
 real, allocatable, dimension(:) :: xk, descent
-public PSTD, xk, descent
+public set_inputs, PSTD, xk, descent
 
 contains
 
@@ -76,69 +76,7 @@ subroutine finalize_PSTD()
   deallocate(descent)
   
 end subroutine finalize_PSTD
-!*****************************************************!
-!*          SEISCOPE OPTIMIZATION TOOLBOX            *!
-!*****************************************************!
-! This routine is used for the initialization of the  !
-! reverse communication mode preconditioned steepest  !
-! descent algorithm from the TOOLBOX.                 !
-!                                                     !
-! The parameters for the linesearch are set here, as  !
-! well as the data structure allocations required for !
-! the use of the algorithm                            !
-!-----------------------------------------------------!
-! INPUT : integer n, dimension of the problem         !
-!       : real fcost                                  !
-!       : real,dimension(n) x,grad,grad_preco         !
-!                           initial guess, gradient,  !
-!                           preconditioned gradient   !
-! INPUT/OUTPUT : optim_type optim data structure      ! 
-!-----------------------------------------------------!
-subroutine init_PSTD(n,x,fcost,grad_preco,optim)
-  
-  implicit none
-  !IN
-  integer :: n
-  real :: fcost
-  real,dimension(n) :: x,grad_preco
-  !IN/OUT
-  type(optim_type) :: optim !data structure   
 
-  !---------------------------------------!
-  ! set counters                          !
-  !---------------------------------------!
-  optim%cpt_iter=0
-  optim%f0=fcost
-  optim%nfwd_pb=0  
-
-  !---------------------------------------!
-  ! initialize linesearch parameters      !
-  ! by default, the max number of         !
-  ! linesearch iteration is set to 20     !
-  ! and the initial steplength is set to 1!
-  !---------------------------------------! 
-  optim%m1=1e-4 ! Wolfe conditions parameter 1 (Nocedal value)
-  optim%m2=0.9  ! Wolfe conditions parameter 2 (Nocedal value)
-  optim%mult_factor=10 ! Bracketting parameter (Gilbert value)
-  optim%fk=fcost
-  optim%nls_max=20 ! max number of linesearch
-  optim%cpt_ls=0
-  optim%first_ls=.true.
-  optim%alpha=1. ! first value for the linesearch steplength
-  
-  !---------------------------------------!
-  ! memory allocations                    !
-  !---------------------------------------!
-  allocate(xk(n))
-  xk(:)=x(:)
-  allocate(descent(n))
-
-  !---------------------------------------!
-  ! first descent direction               !
-  !---------------------------------------!
-  descent(:)=-1.*grad_preco(:)
-
-end subroutine init_PSTD
 !*****************************************************!
 !*          SEISCOPE OPTIMIZATION TOOLBOX            *!
 !*****************************************************!
@@ -195,7 +133,7 @@ subroutine PSTD(n,x,fcost,grad,grad_preco,optim,flag,lb,ub)
   real   :: fcost                      !cost associated with x
   real,dimension(n) :: grad,grad_preco !gradient and preconditioned gradient at x 
   !IN/OUT  
-  integer  :: flag
+  integer(c_int),intent(inout)  :: flag
   real,dimension(n) :: x               !current point
   real(c_float),optional, dimension(n) :: lb,ub
   type(optim_type) :: optim            !data structure   
@@ -208,7 +146,10 @@ subroutine PSTD(n,x,fcost,grad,grad_preco,optim,flag,lb,ub)
      ! subroutine to allocate data structure optim and     !
      ! initialize the linesearch process                   !
      !-----------------------------------------------------!
-     call init_PSTD(n,x,fcost,grad_preco,optim)
+     !call init_PSTD(n,x,fcost,grad_preco,optim)
+     allocate(xk(n), descent(n))
+     xk(:)=x(:)
+     descent(:)=-1.*grad_preco(:)
      call std_linesearch(n,x,fcost,grad,xk,descent,optim,lb,ub)
      call print_info(n,'ST',optim,fcost,grad,flag)
      FLAG=1     

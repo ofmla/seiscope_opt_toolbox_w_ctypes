@@ -124,17 +124,11 @@ program test_PTRN
   
 
   !----------------------------------------------------!
-  ! parameter initialization                           !
+  ! Set size of one-dimensional solution array and     !
+  ! first flag value                                   !
   !----------------------------------------------------!
-  n=2                     ! dimension
-  !FLAG='INIT'             ! first flag
-  FLAG=0                  ! fisrt flag
-  optim%niter_max=100     ! maximum iteration number
-  optim%conv=1e-8         ! tolerance for the stopping criterion
-  optim%print_flag=1      ! print info in output files 
-  optim%debug=.false.     ! level of details for output files
-  optim%niter_max_CG=5    ! maximum number of inner conjugate gradient 
-                          ! iterations
+  n=2     ! dimension
+  FLAG=0  ! first flag -- 'INIT' in original version
   
   !----------------------------------------------------!
   ! intial guess                                       !
@@ -157,6 +151,14 @@ program test_PTRN
   !----------------------------------------------------!
   grad_preco(:)=grad(:)  
   
+  !----------------------------------------------------!
+  ! parameter initialization (i.e., maximum iteration  !
+  ! number, tolerance for stopping criterion, print    !
+  ! info in output files, etc)                         !
+  !----------------------------------------------------!
+  call set_inputs(optim, fcost, 100, 1., 20, 1e-8, &
+                  l=20, niter_max_CG=5)
+                  
   !----------------------------------------------------!
   ! optimization loop: while convergence not reached or!
   ! linesearch not failed, iterate                     !

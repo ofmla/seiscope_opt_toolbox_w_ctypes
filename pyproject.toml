@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools", "wheel", "scikit-build", "cmake", "fypp", "ninja; platform_system!='Windows'"]
+build-backend = "setuptools.build_meta"
+
+[tool.coverage.run]
+branch = true
+omit = ["*/site-packages/*"]
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+force_sort_within_sections = true
+order_by_type = false
+group_by_package = true
+lexicographical = true
+
+[tool.mypy]
+disallow_any_explicit = false
+disallow_any_generics = false
+allow_redefinition = true
+check_untyped_defs = true
+disallow_untyped_calls = true
+disallow_subclassing_any = true
+follow_imports = "silent"
+ignore_errors = false
+ignore_missing_imports = true
+implicit_reexport = false
+strict_optional = true
+strict_equality = true
+no_implicit_optional = true
+local_partial_types = true
+warn_no_return = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unused_configs = true
+warn_unreachable = true
+show_traceback = true
+[[tool.mypy.overrides]]
+module = "numpy.*"
+allow_untyped_calls = true

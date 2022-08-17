@@ -116,7 +116,7 @@ subroutine descent_TRN(n,grad,d,Hd,optim,FLAG)
      optim%qk_CG=0.
      optim%hessian_term=0.     
      optim%norm_residual = norm2(residual)
-     optim%conv_CG=.false.    
+     optim%conv_CG=0    
      optim%cpt_iter_CG=0
      call print_info_TRN(optim,0e0,FLAG)     
      optim%CG_phase=1
@@ -130,7 +130,7 @@ subroutine descent_TRN(n,grad,d,Hd,optim,FLAG)
         ! if dHd < 0, detection of a negative eigenvalue of   !
         ! the Hessian operator, stop the process              !        
         !-----------------------------------------------------!     
-        optim%conv_CG=.true.
+        optim%conv_CG=1
         write(21,*) 'Negative curvature'
         if(optim%cpt_iter_CG.eq.0) then                     
            !-----------------------------------------------------!
@@ -145,7 +145,7 @@ subroutine descent_TRN(n,grad,d,Hd,optim,FLAG)
            ! gradient process (check is this value decresae      !
            ! throughout the CG iterations )                      !
            !-----------------------------------------------------!     
-           if(optim%debug) then 
+           if(optim%debug == 1) then 
               allocate(mgrad(n))
               mgrad(:)=-1.*grad(:)              
               optim%norm_residual = norm2(residual)
@@ -181,7 +181,7 @@ subroutine descent_TRN(n,grad,d,Hd,optim,FLAG)
         ! gradient process (check is this value decresae      !
         ! throughout the CG iterations )                      !
         !-----------------------------------------------------!        
-        if(optim%debug) then
+        if(optim%debug == 1) then
            allocate(mgrad(n))
            mgrad(:)=-1.*grad(:)              
            optim%qkm1_CG=optim%qk_CG
@@ -196,9 +196,13 @@ subroutine descent_TRN(n,grad,d,Hd,optim,FLAG)
         ! Check if the Eisenstat stopping critertion is       !
         ! satisfied                                           !
         !-----------------------------------------------------!        
-        optim%conv_CG=(&
-             (optim%norm_residual.le.(optim%eta*optim%norm_grad)).or.&
-             (optim%cpt_iter_CG.ge.optim%niter_max_CG))        
+         if(&
+            (optim%norm_residual.le.(optim%eta*optim%norm_grad)).or.&
+            (optim%cpt_iter_CG.ge.optim%niter_max_CG)) then
+            optim%conv_CG=1
+         else
+            optim%conv_CG=0
+         endif       
         !-----------------------------------------------------!
         ! Print information on the current CG iteration       !
         !-----------------------------------------------------!
@@ -276,71 +280,7 @@ subroutine forcing_term_TRN(n,grad,residual,optim)
   endif
   
 end subroutine forcing_term_TRN
-!*****************************************************!
-!*          SEISCOPE OPTIMIZATION TOOLBOX            *!
-!*****************************************************!
-! This file contains the routine for the              !
-! initialization of the truncated Newton algorithm    !
-!------------------------------------------------------
-! INPUT : integer n dimension                         !
-!         real,dimension(n) x current point           !
-!         real,dimension(n) grad current gradient     !
-!         character*4 FLAG communication flag         !
-! INPUT/OUTPUT : optim_type optim (data structure)    !
-!-----------------------------------------------------!
-subroutine init_TRN(n,x,fcost,grad,optim)
-  
-  implicit none
-  !IN
-  integer :: n 
-  real :: fcost
-  real,dimension(n) :: x,grad
-  !IN/OUT
-  type(optim_type) :: optim !data structure   
-  
-  !---------------------------------------!
-  ! set counters                          !
-  !---------------------------------------!
-  optim%cpt_iter=0                    
-  optim%f0=fcost   
-  optim%nfwd_pb=0    
-  optim%nhess=0
-  optim%eta=0.9  
-  optim%cpt_iter_CG=0
-  !optim%eta=0.1   
-  !optim%eta=1e-6   
-      
-  !---------------------------------------!
-  ! initialize linesearch parameters      !
-  ! by default, the max number of         !
-  ! linesearch iteration is set to 20     !
-  ! and the initial steplength is set to 1!
-  !---------------------------------------! 
-  optim%m1=1e-4  ! Wolfe conditions parameter 1 (Nocedal value)
-  optim%m2=0.9   ! Wolfe conditions parameter 2 (Nocedal value)
-  optim%mult_factor=10 !Bracketting parameter (Gilbert value)
-  optim%fk=fcost
-  optim%nls_max=20 ! max number of linesearch
-  optim%cpt_ls=0
-  optim%first_ls=.true.
-  optim%alpha=1.   ! first value for the linesearch steplength 
 
-  !---------------------------------------!
-  ! memory allocations                    !
-  !---------------------------------------!
-  allocate(xk(n))
-  xk(:)=x(:)     
-  allocate(descent(n))
-  allocate(descent_prev(n))
-  allocate(residual(n))
-  allocate(eisenvect(n))
-
-  !---------------------------------------!
-  ! norm of the first gradient            !
-  !---------------------------------------!
-  optim%norm_grad = norm2 (grad)
-
-end subroutine init_TRN
 !*****************************************************!
 !*          SEISCOPE OPTIMIZATION TOOLBOX            *!
 !*****************************************************!
@@ -558,12 +498,16 @@ subroutine TRN(n,x,fcost,grad,d,Hd,optim,FLAG,lb,ub)
      ! if FLAG is INIT, call the dedicated initialization  !
      ! subroutine to allocate data structure optim         !
      !-----------------------------------------------------!
-     call init_TRN(n,x,fcost,grad,optim)     
+     !call init_TRN(n,x,fcost,grad,optim)    
+     allocate(xk(n), descent(n), descent_prev(n))
+     allocate(residual(n), eisenvect(n))
+     xk(:)=x(:)
+     optim%norm_grad = norm2 (grad) ! norm of the first gradient
      call print_info_TRN(optim,fcost,FLAG)     
      optim%comm=0     
      optim%CG_phase=0
      optim%nfwd_pb=optim%nfwd_pb+1
-     optim%conv_CG=.false.
+     optim%conv_CG=0
      FLAG=6
   endif
   if(optim%comm.eq.0) then 
@@ -572,7 +516,7 @@ subroutine TRN(n,x,fcost,grad,d,Hd,optim,FLAG,lb,ub)
      ! a descent direction through the conjugate gradient  !
      !-----------------------------------------------------!
      call descent_TRN(n,grad,d,Hd,optim, FLAG) 
-     if(optim%conv_CG) then        
+     if(optim%conv_CG == 1) then        
          !-----------------------------------------------------!
         ! if the conjugate gradient has converged go to next  !
         ! phase: linesearch in the descent direction          !
