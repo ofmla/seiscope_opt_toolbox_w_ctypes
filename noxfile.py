@@ -20,6 +20,8 @@ def tests(session: Session) -> None:
         "-s",
         "--import-mode=importlib",
         "--cov-report",
+        "term",
+        "--cov-report",
         "xml:cov.xml",
     ]
     args = session.posargs + strg
