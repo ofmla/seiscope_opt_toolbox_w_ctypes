@@ -1,7 +1,6 @@
 """Test sotb-wrapper."""
 import filecmp
 import os
-from pathlib import Path
 import subprocess
 import sys
 import sysconfig
