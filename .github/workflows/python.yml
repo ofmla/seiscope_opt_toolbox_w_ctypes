@@ -2,7 +2,7 @@ name: Python test
 
 on:
   push:
-    branches: [main]
+    branches: [main, test_coverage]
   pull_request:
     branches: [main]
   workflow_dispatch:
