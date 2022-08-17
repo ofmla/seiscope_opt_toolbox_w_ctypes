@@ -13,10 +13,10 @@ pyversions = ["3.8", "3.9", "3.10"]
 @nox.session(python=pyversions)
 def tests(session: Session) -> None:
     """Run tests."""
-    #pkg_path = f"{session.virtualenv.location}/lib/python{session.python}/site-packages"
+    pkg_path = f"{session.virtualenv.location}/lib/python{session.python}/site-packages"
     strg = [
         "--cov",
-        "sotb_wrapper",
+        f"{pkg_path}/sotb_wrapper",
         "-s",
         "--import-mode=importlib",
         "--cov-report",
