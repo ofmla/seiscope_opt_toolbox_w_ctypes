@@ -7,9 +7,7 @@ branch = true
 #omit = ["*/site-packages/*"]
 
 [tool.coverage.paths]
-source =
-	sotb_wrapper
-	**/site-packages/sotb_wrapper
+source = ["sotb_wrapper", "*/site-packages/sotb_wrapper"]
 
 [tool.coverage.report]
 show_missing = true
