@@ -38,8 +38,6 @@ jobs:
           CC: ${{ matrix.cc }}
           CXX: ${{ matrix.cxx }}
           FC: ${{ matrix.fc }}
-      - name: Create coverage report
-        run: python -m nox -s cover
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
 
