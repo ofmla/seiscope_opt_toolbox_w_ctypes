@@ -3,7 +3,7 @@
 import nox
 from nox.sessions import Session
 
-nox.options.sessions = "lint", "tests", "mypy"  # default session
+nox.options.sessions = "lint", "tests", "cover", "mypy"  # default session
 locations = "sotb_wrapper", "test", "noxfile.py"  # Linting locations
 locations_mypy = "sotb_wrapper/interface.py"  # mypy locations
 pyversions = ["3.8", "3.9", "3.10"]
@@ -19,16 +19,22 @@ def tests(session: Session) -> None:
         f"{pkg_path}/sotb_wrapper",
         "-s",
         "--import-mode=importlib",
-        "--cov-report",
-        "term",
-        "--cov-report",
-        "xml:cov.xml",
+        "--cov-report=",
+        env={"COVERAGE_FILE": f".coverage.{session.python}"},
     ]
     args = session.posargs + strg
     session.install("pytest", "pytest-cov")
     session.install(".")
     session.run("pytest", *args)
-
+    session.notify("cover")
+    
+@nox.session
+def cover(session: Session) -> None:
+    """Coverage analysis."""
+    session.install("coverage[toml]")
+    session.run("coverage", "combine")
+    session.run("coverage", "report", "--show-missing")
+    session.run("coverage", "erase")
 
 # Linting
 @nox.session(python="3.9")
