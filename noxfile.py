@@ -20,12 +20,11 @@ def tests(session: Session) -> None:
         "-s",
         "--import-mode=importlib",
         "--cov-report=",
-        env={"COVERAGE_FILE": f".coverage.{session.python}"},
     ]
     args = session.posargs + strg
     session.install("pytest", "pytest-cov")
     session.install(".")
-    session.run("pytest", *args)
+    session.run("pytest", *args, env={"COVERAGE_FILE": f".coverage.{session.python}"})
     session.notify("cover")
     
 @nox.session
