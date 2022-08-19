@@ -33,6 +33,7 @@ def cover(session: Session) -> None:
     session.install("coverage[toml]")
     session.run("coverage", "combine")
     session.run("coverage", "report", "--show-missing")
+    session.run("coverage", "xml")
     session.run("coverage", "erase")
 
 # Linting
