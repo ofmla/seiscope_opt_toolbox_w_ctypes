@@ -2,6 +2,7 @@
 
 import nox
 from nox.sessions import Session
+from pathlib import Path
 
 nox.options.sessions = "lint", "tests", "cover", "mypy"  # default session
 locations = "sotb_wrapper", "test", "noxfile.py"  # Linting locations
@@ -25,16 +26,18 @@ def tests(session: Session) -> None:
     session.install("pytest", "pytest-cov")
     session.install(".")
     session.run("pytest", *args, env={"COVERAGE_FILE": f".coverage.{session.python}"})
-    session.notify("cover")
     
 @nox.session
 def cover(session: Session) -> None:
     """Coverage analysis."""
+    args = session.posargs or ["report"]
+
     session.install("coverage[toml]")
-    session.run("coverage", "combine")
-    session.run("coverage", "report", "--show-missing")
-    session.run("coverage", "xml")
-    session.run("coverage", "erase")
+
+    if not session.posargs and any(Path().glob(".coverage.*")):
+        session.run("coverage", "combine")
+
+    session.run("coverage", *args)
 
 # Linting
 @nox.session(python="3.9")
