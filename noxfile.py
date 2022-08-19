@@ -1,9 +1,11 @@
 """Automated testing linting and formatting apparatus."""
 
+from pathlib import Path
+
 import nox
 from nox.sessions import Session
 
-nox.options.sessions = "lint", "tests", "mypy"  # default session
+nox.options.sessions = "lint", "tests", "cover", "mypy"  # default session
 locations = "sotb_wrapper", "test", "noxfile.py"  # Linting locations
 locations_mypy = "sotb_wrapper/interface.py"  # mypy locations
 pyversions = ["3.8", "3.9", "3.10"]
@@ -14,11 +16,31 @@ pyversions = ["3.8", "3.9", "3.10"]
 def tests(session: Session) -> None:
     """Run tests."""
     pkg_path = f"{session.virtualenv.location}/lib/python{session.python}/site-packages"
-    strg = ["--cov", f"{pkg_path}/sotb_wrapper", "-s", "--import-mode=importlib"]
+    strg = [
+        "--cov",
+        f"{pkg_path}/sotb_wrapper",
+        "-s",
+        "--import-mode=importlib",
+        "--cov-report=",
+    ]
     args = session.posargs + strg
     session.install("pytest", "pytest-cov")
     session.install(".")
-    session.run("pytest", *args)
+    session.run("pytest", *args, env={"COVERAGE_FILE": f".coverage.{session.python}"})
+
+
+# Coverage
+@nox.session
+def cover(session: Session) -> None:
+    """Coverage analysis."""
+    args = session.posargs or ["report"]
+
+    session.install("coverage[toml]")
+
+    if not session.posargs and any(Path().glob(".coverage.*")):
+        session.run("coverage", "combine")
+
+    session.run("coverage", *args)
 
 
 # Linting
