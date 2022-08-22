@@ -16,6 +16,15 @@ tests/__pycache__
 sotb_wrapper/__pycache__
 sotb_wrapper/examples/__pycache__
 sotb_wrapper/examples/dask-worker-space
+build
+_build
+_skbuild
+include
+dist
+.pytest_cache
+.nox
+.coverage
+.mypy_cache
 
 # Distribution / packaging
 /*.egg-info/
