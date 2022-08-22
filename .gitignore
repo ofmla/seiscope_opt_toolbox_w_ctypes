@@ -25,6 +25,7 @@ dist
 .nox
 .coverage
 .mypy_cache
+wheelhouse
 
 # Distribution / packaging
 /*.egg-info/
