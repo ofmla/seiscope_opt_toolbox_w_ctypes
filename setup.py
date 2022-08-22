@@ -24,6 +24,7 @@ configuration = {
     'cmake_args': ["-DSKBUILD=ON"],
     'license': 'MIT',
     'install_requires': ['numpy>=1.20'],
+    'setup_requires': ['versioneer'],
     'zip_safe': False
 }
 
