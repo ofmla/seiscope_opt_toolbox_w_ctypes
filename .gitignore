@@ -28,4 +28,4 @@ dist
 wheelhouse
 
 # Distribution / packaging
-/*.egg-info/
+*.egg-info
