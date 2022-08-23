@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: |
-          git fetch --prune --unshallow --tags
+          git fetch --prune --unshallow --tags -f
           echo exit code $?
           git tag --list
 
@@ -40,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: |
-          git fetch --prune --unshallow --tags
+          git fetch --prune --unshallow --tags -f
           echo exit code $?
           git tag --list
 
