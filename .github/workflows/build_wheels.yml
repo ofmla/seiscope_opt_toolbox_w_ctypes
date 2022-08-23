@@ -3,6 +3,8 @@ name: Publish Python distributions to PyPI and TestPyPI
 on:
   push:
     branches: [main]
+    tags:
+      - "*"
   pull_request:
     branches: [main]
   workflow_dispatch:
