@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: |
-          git fetch --prune --depth=1 --tags
+          git fetch --prune --unshallow --tags
           echo exit code $?
           git tag --list
 
@@ -38,7 +38,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: |
-          git fetch --prune --depth=1 --tags
+          git fetch --prune --unshallow --tags
           echo exit code $?
           git tag --list
 
