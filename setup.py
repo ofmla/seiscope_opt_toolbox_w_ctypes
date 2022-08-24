@@ -20,7 +20,7 @@ configuration = {
     'url': 'https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes',
     'author': "Oscar Mojica",
     'author_email': 'o_mojical@hotmail.com',
-    'include_package_data': True,
+    'package_data': {'sotb-wrapper': ['libsotb.so', 'test_*'], },
     'cmake_args': ["-DSKBUILD=ON"],
     'license': 'MIT',
     'install_requires': ['numpy>=1.20'],
