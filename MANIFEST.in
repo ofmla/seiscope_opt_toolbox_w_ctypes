@@ -1,4 +1,18 @@
 include versioneer.py
 include sotb_wrapper/_version.py
 # Anything else you normally use
-
+include .github/workflows/build_wheels.yml
+include .github/workflows/fortran.yml
+include .github/workflows/python.yml
+include .github/workflows/flake8.yml
+include .gitignore
+include noxfile.py
+include fpm.toml
+include config.cmake
+include *.txt
+include test/__init__.py
+recursive-include cmake *.cmake *.cmake.in
+recursive-include app *.txt *.f90
+recursive-include src *.txt *.f90
+recursive-include examples *.txt *.ipynb *.c *.h *.py
+exclude MANIFEST.in

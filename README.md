@@ -18,7 +18,7 @@ and Romain Brossier. Minor changes to the original code have been made to allow 
 
 The SEISCOPE toolbox uses a derived data type (`optim`); functionality that is not yet supported at this time by f2py - and for this reason it is used [ctypes](https://docs.python.org/3/library/ctypes.html). The `optim` data type is maintained, but without allocatable arrays.
 
-The repo contains a `src` directory with the modified fortran source files and another named `apps` where each method is used to find the minimum of the banana Rosenbrock function. The python wrapper for the SEISCOPE optimization toolbox is found inside the `sotb_wrapper` directory. A `tests` directory includes a script to check that the wrapper has suceeded in reproducing bit-for-bit the results of the original fortran code.
+The repo contains a `src` directory with the modified fortran source files and another named `apps` where each method is used to find the minimum of the banana Rosenbrock function. The python wrapper for the SEISCOPE optimization toolbox is found inside the `sotb_wrapper` directory. A `test` directory includes a script to check that the wrapper has suceeded in reproducing the results of the original fortran code.
 
 ## Install Seiscope optimization toolbox (sotb)
 
@@ -42,14 +42,14 @@ cmake --install _build
 ```
 where you need to replace `$PREFIX` with the desired directory.
 
-Examples of use of `sotb` can be found in the `app` folder, which contains a folder with an example for each one of the optimization algorithms available in the library. The executable files for each example are built with `cmake` invocation above and made available at `$PREFIX/bin` folder. As mentioned before, when you use `fpm`, executable files for the examples are also created. In this latest case, you can use `fpm run --profile release <test_name>` to run an specific example. So, if you want to run the example that uses the limited-memory version of Broyden-Fletcher-Goldfarb-Shanno (L-BFGS) algorithm, simply run `fpm run --profile release test_LBFGS`. If you run `fpm run --profile release` you can see the names of the six available examples. You can also find a simple example on calling the Fortran subroutines from a C main program in the [`c_code`](https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes/tree/main/sotb_wrapper/examples/c_code) directory. The example uses the L-BFGS to minimize the Rosenbrock's "banana function". You can create the executable from [`c_code`](https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes/tree/main/sotb_wrapper/examples/c_code) directory, by running 
+Examples of use of `sotb` can be found in the `app` folder, which contains a folder with an example for each one of the optimization algorithms available in the library. The executable files for each example are built with `cmake` invocation above and made available at `$PREFIX/bin` folder. As mentioned before, when you use `fpm`, executable files for the examples are also created. In this latest case, you can use `fpm run --profile release <test_name>` to run an specific example. So, if you want to run the example that uses the limited-memory version of Broyden-Fletcher-Goldfarb-Shanno (L-BFGS) algorithm, simply run `fpm run --profile release test_LBFGS`. If you run `fpm run --profile release` you can see the names of the six available examples. You can also find a simple example on calling the Fortran subroutines from a C main program in the [`c_code`](https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes/tree/main/examples/c_code) directory. The example uses the L-BFGS to minimize the Rosenbrock's "banana function". Assuming that `$PREFIX` points to the repository root directory, you can create the executable from [`c_code`](https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes/tree/main/examples/c_code) directory, by running 
 ```bash
-cmake -S. -B _build -DCMAKE_PREFIX_PATH="`pwd`/../../../"
+cmake -S. -B _build -DCMAKE_PREFIX_PATH="`pwd`/../../"
 cmake --build _build
 ```
 or
 ```bash
-cmake -S. -B _build -Dsotb_DIR="`pwd`/../../../lib/cmake/sotb"
+cmake -S. -B _build -Dsotb_DIR="`pwd`/../../lib/cmake/sotb"
 cmake --build _build
 ```
 ## Install the python wrapper of sotb (sotb-wrapper)
@@ -84,13 +84,14 @@ def rosenbrock(X):
 sotb = interface.sotb_wrapper()
 n = 2 # dimension
 flag = 0 # first flag; 0 means initialization
-X = np.ones(2, dtype=np.float32)*-1. # intial guess
+X = np.ones(2, dtype=np.float32)*-1. # initial guess
 
 # computation of the cost and gradient associated with the initial guess
 fcost, grad = rosenbrock(X)
 # copy of grad in grad_preco: no preconditioning in this test
 grad_preco = np.copy(grad)
-# Set parameters of the UserDefined derived type in Fortran (ctype structure) 
+# Set parameters of the UserDefined derived type in Fortran (ctype structure).
+# The first two parameters are mandatory; all others are optional. 
 sotb.set_inputs(fcost, 10000, conv=1e-8, l=10)
 
 # optimization loop: while convergence not reached or linesearch not failed, iterate
@@ -104,7 +105,7 @@ while (flag != 2 and flag != 4):
 print('FINAL iterate is : ', X)
 ```
 
-The code above is part of a tutorial in the form of a Jupyter notebook (`rosenbrock.ipynb`) provided in the [`sotb_wrapper/examples`](https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes/tree/main/sotb_wrapper/examples) subdirectory. The goal of the tutorial is show you how one can use sotb-wrapper to find a minimum for a problem, which can optionally be subject to bound constraints (also called box constraints). The directory also includes examples in the context of geophysical inversion. Note that you must have [Devito](https://www.devitoproject.org/) in order to be able to run them. A python script `plot_curves.py` is also provide in the `examples` directory. It may not be the best implementation and is intended for illustrative purposes only. 
+The code above is part of a tutorial in the form of a Jupyter notebook (`rosenbrock.ipynb`) provided in the [`examples`](https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes/tree/main/examples) subdirectory. The goal of the tutorial is show you how one can use sotb-wrapper to find a minimum for a problem, which can optionally be subject to bound constraints (also called box constraints). The directory also includes examples in the context of geophysical inversion. Note that you must have [Devito](https://www.devitoproject.org/) in order to be able to run them. A python script `plot_curves.py` is also provide in the `examples` directory. It may not be the best implementation and is intended for illustrative purposes only. 
 
 The following figures were obtained with the `plot_curves.py` script after ran one of the examples (`lsrtm_aniso.py`).
 
