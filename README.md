@@ -109,7 +109,7 @@ The code above is part of a tutorial in the form of a Jupyter notebook (`rosenbr
 
 The following figures were obtained with the `plot_curves.py` script after ran one of the examples (`lsrtm_aniso.py`).
 
-<img src="./sotb_wrapper/examples/computationalcost_curves.svg" width="425"/> <img src="./sotb_wrapper/examples/convergence_curves.svg" width="425"/> 
+<img src="./examples/computationalcost_curves.svg" width="425"/> <img src="./examples/convergence_curves.svg" width="425"/> 
 
 License
 -----
