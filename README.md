@@ -77,7 +77,7 @@ cmake --install build --prefix=/usr/local/sotb
 Add library path to the environment variable `LD_LIBRARY_PATH`
 
 ```bash
-export LD_LIBRARY_PATH=/usr/local/sotb:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/usr/local/sotb/lib:$LD_LIBRARY_PATH
 ```
 
 Install the Python wrapper
