@@ -62,6 +62,38 @@ It is also possible to install directly from the GitHub repository. You will nee
 ```bash
 pip install git+https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes
 ```
+
+## Quick install of the sotb library and its Python wrapper
+
+Compile the SOTB library using CMake.
+
+```bash
+cd seiscope_opt_toolbox_w_ctypes
+cmake -S. -Bbuild
+cmake --build build
+cmake --install build --prefix=/usr/local/sotb
+```
+
+Add library path to the environment variable `LD_LIBRARY_PATH`
+
+```bash
+export LD_LIBRARY_PATH=/usr/local/sotb:$LD_LIBRARY_PATH
+```
+
+Install the Python wrapper
+
+```
+pip3 install .
+```
+
+Run tests
+
+```bash
+# if not installed install py.test using: pip3 install pytest
+py.test test
+```
+
+
 ### Usage
 
 The following example demonstrates how to define and solve the classical Rosenbrock problem

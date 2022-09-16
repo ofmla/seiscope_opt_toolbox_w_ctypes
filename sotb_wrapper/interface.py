@@ -111,14 +111,15 @@ class UserDefined(ctypes.Structure):
 
 
 # Load shared library
-path = Path(__file__).parent
 name = "libsotb"
 name = f"{name}.so"
 
 # This is how a dll/so library is loaded
 try:
-
-    lib_sotb = ctypes.CDLL(str(path / name), winmode=0)
+    # the path containing the library 
+    # "libsotb.so" must be present on the variable LD_LIBRARY_PATH
+    # for instance LD_LIBRARY_PATH=/usr/local/sotb/lib:$LD_LIBRARY_PATH
+    lib_sotb = ctypes.CDLL(name, winmode=0)
 
 except Exception as e:
 
