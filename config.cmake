@@ -10,11 +10,26 @@
 option(BUILD_SHARED_LIBS "Whether the libraries built should be shared" TRUE)
 
 if (${BUILD_SHARED_LIBS})
-  file(RELATIVE_PATH relativeRpath
-      ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}
-      ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}
-  )
-  set(CMAKE_INSTALL_RPATH $ORIGIN $ORIGIN/${relativeRpath})
+  if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    message(STATUS "Darwin specific RPATH configuration")
+    set(CMAKE_MACOSX_RPATH TRUE)
+    set(CMAKE_SKIP_BUILD_RPATH FALSE)
+# when building, don't use the install RPATH already
+# (but later on when installing)
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+# add the automatically determined parts of the RPATH
+# which point to directories outside the build tree to the install RPATH
+    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+  #set(CMAKE_BUILD_RPATH_USE_ORIGIN TRUE)
+  #list(APPEND CMAKE_BUILD_RPATH ${PROJECT_BINARY_DIR}/lib)
+  else()
+    file(RELATIVE_PATH relativeRpath
+        ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}
+        ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}
+    )
+    set(CMAKE_INSTALL_RPATH $ORIGIN $ORIGIN/${relativeRpath})
+  endif()
 endif()
 
 #
