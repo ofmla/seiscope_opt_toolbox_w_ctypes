@@ -9,6 +9,7 @@
 # Turn this on, if the libraries should be built as shared libraries
 option(BUILD_SHARED_LIBS "Whether the libraries built should be shared" TRUE)
 
+if(NOT SKBUILD)
 if (${BUILD_SHARED_LIBS})
   if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     message(STATUS "Darwin specific RPATH configuration")
@@ -31,7 +32,7 @@ if (${BUILD_SHARED_LIBS})
     set(CMAKE_INSTALL_RPATH $ORIGIN $ORIGIN/${relativeRpath})
   endif()
 endif()
-
+endif()
 #
 # Fortran compiler dependent config options
 #
