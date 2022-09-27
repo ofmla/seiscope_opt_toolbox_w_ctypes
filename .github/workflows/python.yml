@@ -47,6 +47,7 @@ jobs:
           CXX: ${{ matrix.cxx }}
           FC: ${{ matrix.fc }}
       - name: Upload coverage data
+        if: contains(matrix.os, 'ubuntu')
         uses: "actions/upload-artifact@v3"
         with:
           name: coverage-data
