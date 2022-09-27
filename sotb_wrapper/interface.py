@@ -4,6 +4,7 @@ from __future__ import annotations
 import ctypes
 from ctypes import byref, c_float, c_int, POINTER
 from pathlib import Path
+import sys
 from typing import Optional
 
 import numpy as np
@@ -113,7 +114,12 @@ class UserDefined(ctypes.Structure):
 # Load shared library
 path = Path(__file__).parent
 name = "libsotb"
-name = f"{name}.so"
+if sys.platform.startswith("linux"):
+    name = f"{name}.so"
+elif sys.platform == "darwin":
+    name = f"{name}.dylib"
+else:
+    raise ImportError(f"Your OS is not supported: {sys.platform}")
 
 # This is how a dll/so library is loaded
 try:
@@ -129,21 +135,30 @@ except Exception as e:
     github_url = "https://github.com/ofmla/seiscope_opt_toolbox_w_ctypes#compiling"
     print()
     print(
-        "Failed to load the required SEISCOPE OPTIMIZATION TOOLBOX (sotb) "
+        "Failed to load the required SEISCOPE OPTIMIZATION TOOLBOX (sotb) shared"
+        + " library."
         + "\n"
-        + "shared library. You can likely resolve this error by building "
+        + "You are likely to see this message as consequence of the attempt to "
+        + "run the tests "
         + "\n"
-        + "the required sotb shared library on your linux system. "
-        + "\n"
-        + "\n"
-        + "Visit"
-        + "\n"
-        + "\n"
-        + "    "
-        + github_url
+        + "from the local project directory (the one obtained with the clone command). "
         + "\n"
         + "\n"
-        + "for instructions to build the sotb library on your linux system. "
+        + "If your objective is to contribute to sotb-wrapper and you got a development "
+        + "\n"
+        + "copy via `git clone` command, you must have the nox package to be able to run"
+        + "\n"
+        + "the tests from the local repository. So an immediate step after cloning the "
+        + "repo"
+        + "\n"
+        + "is to install nox in your python environment"
+        + "\n"
+        + "\n"
+        + "python3 -m pip install nox"
+        + "\n"
+        + "\n"
+        + "You can then make changes and use the command `nox -s tests` to execute the "
+        + "tests session. "
         + "\n"
     )
     print()

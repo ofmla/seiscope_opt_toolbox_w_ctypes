@@ -14,14 +14,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu]
+        os: [ubuntu, macos]
         python_version: ["3.8", "3.9", "3.10"]
         include:
           - os: ubuntu
             cc: gcc-10
             cxx: g++-10
             fc: gfortran-10                
-            
+          - os: macos
+            cc: gcc-11
+            cxx: g++-11
+            fc: gfortran-11
+        exclude:
+          - os: macos
+            python_version: "3.8"
+          - os: macos
+            python_version: "3.9"
     steps:          
       - uses: actions/checkout@v3
       - name: Install Python ${{ matrix.python_version }}
@@ -39,6 +47,7 @@ jobs:
           CXX: ${{ matrix.cxx }}
           FC: ${{ matrix.fc }}
       - name: Upload coverage data
+        if: contains(matrix.os, 'ubuntu')
         uses: "actions/upload-artifact@v3"
         with:
           name: coverage-data
@@ -71,4 +80,5 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           files: ./coverage.xml
+          verbose: true
 
