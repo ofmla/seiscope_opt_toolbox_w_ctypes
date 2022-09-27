@@ -9,7 +9,6 @@
 # Turn this on, if the libraries should be built as shared libraries
 option(BUILD_SHARED_LIBS "Whether the libraries built should be shared" TRUE)
 
-if(NOT SKBUILD)
 if (${BUILD_SHARED_LIBS})
   if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     message(STATUS "Darwin specific RPATH configuration")
@@ -18,7 +17,11 @@ if (${BUILD_SHARED_LIBS})
 # when building, don't use the install RPATH already
 # (but later on when installing)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+    if(SKBUILD)
+      set(CMAKE_INSTALL_RPATH "sotb_wrapper")
+    else()
+      set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+    endif()
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -31,7 +34,6 @@ if (${BUILD_SHARED_LIBS})
     )
     set(CMAKE_INSTALL_RPATH $ORIGIN $ORIGIN/${relativeRpath})
   endif()
-endif()
 endif()
 #
 # Fortran compiler dependent config options
