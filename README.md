@@ -4,6 +4,8 @@
 [![DOI](https://zenodo.org/badge/341695999.svg)](https://zenodo.org/badge/latestdoi/341695999)
 [![codecov](https://codecov.io/gh/ofmla/seiscope_opt_toolbox_w_ctypes/branch/main/graph/badge.svg?token=BN7NK8A9OJ)](https://codecov.io/gh/ofmla/seiscope_opt_toolbox_w_ctypes)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![fpm](https://img.shields.io/badge/fpm-Fortran_package_manager-734f96)](https://fpm.fortran-lang.org)
+[![Fortran](https://img.shields.io/badge/Fortran-734f96?logo=fortran&style=flat)](https://fortran-lang.org)
 
 
 # sotb-wrapper: A Python wrapper for the SEISCOPE optimization toolbox (using Ctypes)
