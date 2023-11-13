@@ -19,4 +19,4 @@ jobs:
         python-versions: "3.9"
     - name: Lint with flake8
       run: |
-        python -m nox -s lint --verbose
+        nox -s lint --verbose
