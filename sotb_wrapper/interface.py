@@ -123,11 +123,9 @@ else:
 
 # This is how a dll/so library is loaded
 try:
-
     lib_sotb = ctypes.CDLL(str(path / name), winmode=0)
 
 except Exception as e:
-
     import logging
 
     logger = logging.Logger("catch_all")
