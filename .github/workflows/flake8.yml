@@ -15,8 +15,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: wntrblm/nox@2023.04.22
-      with:
-        python-versions: "3.9"
     - name: Lint with flake8
       run: |
         nox -s lint --verbose
